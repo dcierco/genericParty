@@ -1,0 +1,78 @@
+[gd_scene load_steps=2 format=3 uid="uid://dhf74egj0b4jv"]
+
+[ext_resource type="Script" uid="uid://bt424k7nox0n3" path="res://scripts/minigames/minigame_base.gd" id="1_hwv1k"]
+
+[node name="MinigameBase" type="Node2D"]
+script = ExtResource("1_hwv1k")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="TimerContainer" type="PanelContainer" parent="UI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_right = 50.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="TimeLabel" type="Label" parent="UI/TimerContainer"]
+layout_mode = 2
+text = "60"
+horizontal_alignment = 1
+
+[node name="IntroContainer" type="PanelContainer" parent="UI"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/IntroContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="UI/IntroContainer/VBoxContainer"]
+layout_mode = 2
+text = "Minigame Title"
+horizontal_alignment = 1
+
+[node name="CountdownLabel" type="Label" parent="UI/IntroContainer/VBoxContainer"]
+layout_mode = 2
+text = "3"
+horizontal_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="UI/IntroContainer/VBoxContainer"]
+layout_mode = 2
+text = "Description of the minigame goes here"
+horizontal_alignment = 1
+
+[node name="ResultsContainer" type="PanelContainer" parent="UI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ResultsContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="UI/ResultsContainer/VBoxContainer"]
+layout_mode = 2
+text = "Results"
+horizontal_alignment = 1
+
+[node name="ResultsList" type="VBoxContainer" parent="UI/ResultsContainer/VBoxContainer"]
+layout_mode = 2

@@ -1,11 +1,8 @@
-# Godot 4+ specific ignores
-.godot/
-.nomedia
-
 # Godot-specific ignores
+.godot/
 .import/
 export.cfg
-export_credentials.cfg
+export_presets.cfg
 
 # Imported translations (automatically generated from CSV files)
 *.translation
@@ -14,3 +11,26 @@ export_credentials.cfg
 .mono/
 data_*/
 mono_crash.*.json
+
+# Build artifacts
+*.o
+*.os
+*.so
+*.dylib
+*.dblite
+*.dll
+*.exp
+*.lib
+*.obj
+
+# Temporary files
+.DS_Store
+.vscode/
+.idea/
+
+# Export directories
+export/
+build/
+
+# Other
+.vs/
