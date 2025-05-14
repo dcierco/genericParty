@@ -3,8 +3,8 @@ extends "res://scripts/minigames/minigame_base.gd"
 # Game settings
 var platform_size = Vector2(1000, 1000)  # Larger platform (25x25 cells)
 var cell_size = 40
-var lava_speed = 13.0  # Cells per second (to fill 625 cells in 60 seconds)
-var push_power = 1500.0
+var lava_speed = 11.3  # Cells per second (to fill 625 cells in 60 seconds)
+var push_power = 300.0
 var player_speed = 300.0
 
 # Spiral shrinking parameters
