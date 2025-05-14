@@ -1,7 +1,7 @@
-[gd_scene load_steps=3 format=3 uid="uid://b2yl6f0gwn1lu"]
+[gd_scene load_steps=3 format=3 uid="uid://ff5qdnmufywm"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_5dvjb"]
-[ext_resource type="Script" path="res://scripts/minigames/shrinking_platform.gd" id="2_1bghx"]
+[ext_resource type="Script" uid="uid://baaep1eqtdrkv" path="res://scripts/minigames/shrinking_platform.gd" id="2_1bghx"]
 
 [node name="ShrinkingPlatform" instance=ExtResource("1_5dvjb")]
 script = ExtResource("2_1bghx")
