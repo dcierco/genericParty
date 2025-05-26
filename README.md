@@ -52,7 +52,7 @@ This approach allows each individual minigame to focus on its specific gameplay 
 A button-mashing race where players must rapidly press their action button to move their character toward the finish line. The first player to reach the finish line wins.
 
 - **Controls**: Player 1: Space, Player 2: Enter
-- **Time Limit**: 30 seconds
+- **Time Limit**: 10 seconds
 - **Scoring**: First to finish gets the highest score
 
 ### Shrinking Platform
@@ -65,13 +65,23 @@ A survival minigame where players try to stay on a platform as it gets consumed 
 - **Scoring**: Last player standing gets the most points
 
 ### Avoid the Obstacles
-Players control characters that are constantly moving forward and must dodge incoming obstacles. The last player remaining or the player who survives the longest wins.
+Players control characters that must dodge incoming obstacles from multiple directions. The last player remaining or the player who survives the longest wins. Push opponents into danger to gain an advantage!
 
 - **Controls**: 
-  - Player 1: WASD (movement) + Space (push)
-  - Player 2: Arrow Keys (movement) + Enter (push)
+  - Player 1: A/D (move) + W (jump) + Space (push)
+  - Player 2: Left/Right Arrows (move) + Up Arrow (jump) + Enter (push)
 - **Time Limit**: 60 seconds or until one player remains
-- **Scoring**: Points awarded based on survival time, or last player standing wins.
+- **Scoring**: Points awarded based on survival time, or last player standing wins
+
+### Jumping Platforms
+A vertical platforming challenge where players must jump on procedurally generated platforms to reach the highest point. Push opponents off platforms and avoid falling behind as the camera moves upward!
+
+- **Controls**: 
+  - Player 1: A/D (move) + W (jump) + Space (push)
+  - Player 2: Left/Right Arrows (move) + Up Arrow (jump) + Enter (push)
+- **Time Limit**: 60 seconds
+- **Features**: One-way collision platforms, dynamic camera movement, procedural generation
+- **Scoring**: Points based on height reached, bonus for being last player standing
 
 ## Getting Started
 

@@ -4,6 +4,7 @@ extends "res://scripts/minigames/minigame_base.gd"
 const PLAYER_HORIZONTAL_SPEED = 350.0
 const JUMP_VELOCITY = -650.0 
 const PLAYER_GRAVITY_SCALE = 2.0
+const PUSH_POWER = 2000.0
 
 # Obstacle settings
 const OBSTACLE_FALL_SPEED_MIN = 150.0
@@ -36,15 +37,17 @@ var obstacle_count = 0
 # Player input mapping
 var player_input_map = {
 	0: {
-		"left": "p1_left_ao", 
-		"right": "p1_right_ao", 
-		"jump": "p1_jump_ao",
+		"left": "p1_left", 
+		"right": "p1_right", 
+		"jump": "p1_up",
+		"push": "p1_action",
 		"team": "red"
 	},
 	1: {
-		"left": "p2_left_ao", 
-		"right": "p2_right_ao", 
-		"jump": "p2_jump_ao",
+		"left": "p2_left", 
+		"right": "p2_right", 
+		"jump": "p2_up",
+		"push": "p2_action",
 		"team": "blue"
 	}
 }
@@ -52,7 +55,7 @@ var player_input_map = {
 func _ready():
 	minigame_id = "avoid_the_obstacles"
 	minigame_name = "Avoid the Obstacles!"
-	minigame_description = "Dodge the falling objects! Last player standing wins, or survive the longest!\nControls:\nP1: A/D (move) + Space (jump)\nP2: Arrows (move) + Enter (jump)"
+	minigame_description = "Dodge the falling objects! Last player standing wins, or survive the longest!\nControls:\nP1: A/D (move) + W (jump) + Space (push)\nP2: Arrows (move) + Up (jump) + Enter (push)"
 
 	minigame_duration = 60.0
 	has_time_limit = true
@@ -176,12 +179,29 @@ func process_player_movement(player: CharacterBody2D, player_id: int, delta: flo
 	if Input.is_action_just_pressed(inputs.jump) and player.is_on_floor():
 		velocity.y = JUMP_VELOCITY
 	
+	# Push action
+	if Input.is_action_just_pressed(inputs.push):
+		push_other_players(player, player_id)
+	
 	# Apply movement
 	player.velocity = velocity
 	player.move_and_slide()
 	
 	# Store updated velocity
 	player_velocities[player_id] = player.velocity
+
+func push_other_players(pusher: CharacterBody2D, pusher_id: int):
+	var other_player = player2 if pusher_id == 0 else player1
+	
+	if is_instance_valid(other_player) and not other_player.get_meta("eliminated") and other_player.visible:
+		var distance = pusher.global_position.distance_to(other_player.global_position)
+		
+		if distance < 50:  # Push range
+			var push_direction = (other_player.global_position - pusher.global_position).normalized()
+			
+			# Apply push directly to the other player's position and velocity
+			other_player.position += push_direction * PUSH_POWER * 0.05  # Small immediate push
+			other_player.velocity += push_direction * PUSH_POWER
 
 func check_obstacle_collisions(player: CharacterBody2D, player_id: int):
 	if not is_instance_valid(player) or player.get_meta("eliminated") or not player.visible:
@@ -233,8 +253,8 @@ func process_playing(delta):
 	super.process_playing(delta)
 
 func increase_difficulty(delta):
-	# Increase difficulty over time
-	difficulty_percent += delta * 1.5  # 0-100% over ~67 seconds
+	# Increase difficulty over time (10% faster progression)
+	difficulty_percent += delta * 1.65  # 0-100% over ~60 seconds
 	difficulty_percent = min(difficulty_percent, 100.0)
 	
 	# Update spawn interval based on difficulty
@@ -400,6 +420,11 @@ func eliminate_player(player_id):
 	print("Player " + str(player_id + 1) + " eliminated!")
 	player.set_meta("eliminated", true)
 	player.visible = false
+	
+	# Disable collision so eliminated player doesn't interfere
+	player.set_collision_layer_value(2, false)  # Remove from player layer
+	player.set_collision_mask_value(1, false)   # Don't collide with world
+	player.set_collision_mask_value(3, false)   # Don't collide with enemies
 	
 	# Calculate survival score (time survived * 10 points per second)
 	var survival_time = player_survival_times.get(player_id, 0.0)

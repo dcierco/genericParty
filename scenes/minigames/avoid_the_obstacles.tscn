@@ -33,8 +33,8 @@ text = "Avoid the Obstacles!"
 [node name="DescriptionLabel" parent="UI/IntroContainer/VBoxContainer" index="2"]
 text = "Dodge the falling objects! Last player standing wins!
 Controls:
-Player 1: A/D (move) + Space (jump)
-Player 2: Left/Right Arrows (move) + Enter (jump)"
+Player 1: A/D (move) + W (jump) + Space (push)
+Player 2: Left/Right Arrows (move) + Up (jump) + Enter (push)"
 
 [node name="SurvivalContainer" type="GridContainer" parent="UI" index="3"]
 anchors_preset = 5

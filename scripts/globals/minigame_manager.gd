@@ -41,7 +41,15 @@ func register_all_minigames():
 		"avoid_the_obstacles",
 		"res://scenes/minigames/avoid_the_obstacles.tscn",
 		"Avoid the Obstacles!",
-		"Dodge the falling objects! Last player standing wins, or survive together!\nControls:\nPlayer 1: A/D (move) + Space (jump)\nPlayer 2: Left/Right Arrows (move) + Enter (jump)"
+		"Dodge the falling objects! Last player standing wins, or survive together!\nControls:\nPlayer 1: A/D (move) + W (jump) + Space (push)\nPlayer 2: Left/Right Arrows (move) + Up (jump) + Enter (push)"
+	)
+
+	# Register Jumping Platforms game
+	register_minigame(
+		"jumping_platforms",
+		"res://scenes/minigames/jumping_platforms.tscn",
+		"Jumping Platforms!",
+		"Jump on platforms and reach the highest point! Push enemies to make them fall!\nControls:\nPlayer 1: A/D (move) + W (jump) + Space (push)\nPlayer 2: Left/Right Arrows (move) + Up (jump) + Enter (push)"
 	)
 
 func register_minigame(id: String, scene_path: String, display_name: String, description: String):

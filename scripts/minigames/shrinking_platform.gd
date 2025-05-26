@@ -5,7 +5,7 @@ var cell_size = 40
 var grid_width = 25
 var grid_height = 25
 var lava_speed = 11.3  # Cells per second (to fill the grid in 60 seconds)
-var push_power = 300.0
+var push_power = 600.0
 var player_speed = 300.0
 
 # Spiral shrinking parameters
