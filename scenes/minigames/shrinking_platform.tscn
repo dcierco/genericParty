@@ -1,7 +1,88 @@
-[gd_scene load_steps=3 format=3 uid="uid://ff5qdnmufywm"]
+[gd_scene load_steps=4 format=3 uid="uid://ff5qdnmufywm"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_5dvjb"]
 [ext_resource type="Script" uid="uid://c174wihqcqh31" path="res://scripts/minigames/shrinking_platform.gd" id="2_1bghx"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 15.0
+
 [node name="ShrinkingPlatform" instance=ExtResource("1_5dvjb")]
 script = ExtResource("2_1bghx")
+
+[node name="TitleLabel" parent="UI/IntroContainer/VBoxContainer" index="0"]
+text = "Shrinking Platform"
+
+[node name="DescriptionLabel" parent="UI/IntroContainer/VBoxContainer" index="2"]
+text = "Stay on the platform as it shrinks! Push opponents into the lava!
+Controls:
+Player 1: WASD (move) + Space (push)
+Player 2: Arrow Keys (move) + Enter (push)"
+
+[node name="GameContainer" type="Node2D" parent="." index="1"]
+
+[node name="PlatformContainer" type="CenterContainer" parent="GameContainer" index="0"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Platform" type="GridContainer" parent="GameContainer/PlatformContainer" index="0"]
+layout_mode = 2
+theme_override_constants/h_separation = 0
+theme_override_constants/v_separation = 0
+columns = 25
+
+[node name="PlayerSpawnPoints" type="Node2D" parent="GameContainer" index="1"]
+
+[node name="Player1Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPoints" index="0"]
+position = Vector2(580, 320)
+
+[node name="Player2Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPoints" index="1"]
+position = Vector2(700, 320)
+
+[node name="Players" type="Node2D" parent="GameContainer" index="2"]
+
+[node name="Player1" type="CharacterBody2D" parent="GameContainer/Players" index="0"]
+position = Vector2(580, 320)
+collision_layer = 2
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player1" index="0"]
+shape = SubResource("CircleShape2D_player")
+
+[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player1" index="1"]
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+color = Color(1, 0.2, 0.2, 1)
+
+[node name="Player2" type="CharacterBody2D" parent="GameContainer/Players" index="1"]
+position = Vector2(700, 320)
+collision_layer = 2
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player2" index="0"]
+shape = SubResource("CircleShape2D_player")
+
+[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player2" index="1"]
+offset_left = -15.0
+offset_top = -15.0
+offset_right = 15.0
+offset_bottom = 15.0
+color = Color(0.2, 0.4, 1, 1)
+
+[node name="DebugInfo" type="Label" parent="GameContainer" index="3"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 100.0
+theme_override_font_sizes/font_size = 12
+text = "Platform Cells: 0
+Lava Cells: 0
+Spiral Position: (0,0)"

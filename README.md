@@ -64,6 +64,15 @@ A survival minigame where players try to stay on a platform as it gets consumed 
 - **Time Limit**: 60 seconds
 - **Scoring**: Last player standing gets the most points
 
+### Avoid the Obstacles
+Players control characters that are constantly moving forward and must dodge incoming obstacles. The last player remaining or the player who survives the longest wins.
+
+- **Controls**: 
+  - Player 1: WASD (movement) + Space (push)
+  - Player 2: Arrow Keys (movement) + Enter (push)
+- **Time Limit**: 60 seconds or until one player remains
+- **Scoring**: Points awarded based on survival time, or last player standing wins.
+
 ## Getting Started
 
 1. Install Godot 4.4.1

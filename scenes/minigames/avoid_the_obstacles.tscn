@@ -1,0 +1,220 @@
+[gd_scene load_steps=7 format=3 uid="uid://c5j3f7k2l8g1"]
+
+[ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_base"]
+[ext_resource type="Script" uid="uid://c0la3uwclwi4" path="res://scripts/minigames/avoid_the_obstacles.gd" id="2_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
+bg_color = Color(1, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p2fill"]
+bg_color = Color(0.2, 0.4, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
+size = Vector2(1280, 50)
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
+radius = 15.0
+height = 50.0
+
+[node name="AvoidTheObstacles" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+
+[node name="TitleLabel" parent="UI/IntroContainer/VBoxContainer" index="0"]
+text = "Avoid the Obstacles!"
+
+[node name="DescriptionLabel" parent="UI/IntroContainer/VBoxContainer" index="2"]
+text = "Dodge the falling objects! Last player standing wins!
+Controls:
+Player 1: A/D (move) + Space (jump)
+Player 2: Left/Right Arrows (move) + Enter (jump)"
+
+[node name="SurvivalContainer" type="GridContainer" parent="UI" index="3"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 60.0
+grow_horizontal = 2
+theme_override_constants/h_separation = 20
+columns = 2
+
+[node name="Player1SurvivalVBox" type="VBoxContainer" parent="UI/SurvivalContainer" index="0"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="UI/SurvivalContainer/Player1SurvivalVBox" index="0"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+text = "Player 1"
+horizontal_alignment = 1
+
+[node name="SurvivalBarP1" type="ProgressBar" parent="UI/SurvivalContainer/Player1SurvivalVBox" index="1"]
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_p1fill")
+max_value = 60.0
+step = 0.1
+show_percentage = false
+
+[node name="Player2SurvivalVBox" type="VBoxContainer" parent="UI/SurvivalContainer" index="1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="UI/SurvivalContainer/Player2SurvivalVBox" index="0"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.4, 1, 1)
+text = "Player 2"
+horizontal_alignment = 1
+
+[node name="SurvivalBarP2" type="ProgressBar" parent="UI/SurvivalContainer/Player2SurvivalVBox" index="1"]
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_p2fill")
+max_value = 60.0
+step = 0.1
+show_percentage = false
+
+[node name="DifficultyLabel" type="Label" parent="UI" index="4"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 36.0
+grow_horizontal = 0
+text = "Difficulty: Easy"
+horizontal_alignment = 2
+
+[node name="GameContainer" type="Node2D" parent="." index="1"]
+editor_description = "Container for players, obstacles, ground, etc."
+
+[node name="Background" type="ColorRect" parent="GameContainer" index="0"]
+offset_right = 1280.0
+offset_bottom = 720.0
+color = Color(0.0980392, 0.0980392, 0.152941, 1)
+metadata/_edit_lock_ = true
+
+[node name="Ground" type="StaticBody2D" parent="GameContainer" index="1"]
+position = Vector2(640, 650)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Ground" index="0"]
+position = Vector2(0, 43)
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="ColorRect" type="ColorRect" parent="GameContainer/Ground" index="1"]
+offset_left = -640.0
+offset_top = 18.0
+offset_right = 640.0
+offset_bottom = 68.0
+color = Color(0.45098, 0.45098, 0.45098, 1)
+
+[node name="Walls" type="Node2D" parent="GameContainer" index="2"]
+
+[node name="LeftWall" type="StaticBody2D" parent="GameContainer/Walls" index="0"]
+position = Vector2(10, 360)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Walls/LeftWall" index="0"]
+visible = false
+position = Vector2(0, -5)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="RightWall" type="StaticBody2D" parent="GameContainer/Walls" index="1"]
+position = Vector2(1270, 360)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Walls/RightWall" index="0"]
+visible = false
+position = Vector2(0, -5)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_ground")
+
+[node name="ObstacleSpawnTimer" type="Timer" parent="GameContainer" index="3"]
+wait_time = 1.5
+
+[node name="ObstacleSpawnPositions" type="Node2D" parent="GameContainer" index="4"]
+
+[node name="SpawnPos1" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="0"]
+position = Vector2(100, -50)
+
+[node name="SpawnPos2" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="1"]
+position = Vector2(300, -50)
+
+[node name="SpawnPos3" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="2"]
+position = Vector2(500, -50)
+
+[node name="SpawnPos4" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="3"]
+position = Vector2(700, -50)
+
+[node name="SpawnPos5" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="4"]
+position = Vector2(900, -50)
+
+[node name="SpawnPos6" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="5"]
+position = Vector2(1100, -50)
+
+[node name="PlayerSpawnPositions" type="Node2D" parent="GameContainer" index="5"]
+editor_description = "Holds position markers for player starting locations"
+
+[node name="P1Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPositions" index="0"]
+position = Vector2(300, 550)
+
+[node name="P2Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPositions" index="1"]
+position = Vector2(900, 550)
+
+[node name="Players" type="Node2D" parent="GameContainer" index="6"]
+
+[node name="Player1" type="CharacterBody2D" parent="GameContainer/Players" index="0"]
+position = Vector2(300, 550)
+collision_layer = 2
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player1" index="0"]
+shape = SubResource("CapsuleShape2D_player")
+
+[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player1" index="1"]
+offset_left = -15.0
+offset_top = -25.0
+offset_right = 15.0
+offset_bottom = 25.0
+color = Color(1, 0.2, 0.2, 1)
+
+[node name="Player2" type="CharacterBody2D" parent="GameContainer/Players" index="1"]
+position = Vector2(900, 550)
+collision_layer = 2
+collision_mask = 3
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player2" index="0"]
+shape = SubResource("CapsuleShape2D_player")
+
+[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player2" index="1"]
+offset_left = -15.0
+offset_top = -25.0
+offset_right = 15.0
+offset_bottom = 25.0
+color = Color(0.2, 0.4, 1, 1)
+
+[node name="ObstacleContainer" type="Node2D" parent="GameContainer" index="7"]
+editor_description = "Obstacles will be added as children to this node by the script"
+
+[node name="DebugInfo" type="Label" parent="GameContainer" index="8"]
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 220.0
+offset_bottom = 130.0
+theme_override_font_sizes/font_size = 12
+text = "Active Obstacles: 0
+Difficulty: 0%
+Spawn Rate: 0s"

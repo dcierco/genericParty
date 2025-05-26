@@ -1,10 +1,33 @@
-[gd_scene load_steps=3 format=3 uid="uid://cw4cbf0gvsnuw"]
+[gd_scene load_steps=5 format=3 uid="uid://cw4cbf0gvsnuw"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_7f2yl"]
 [ext_resource type="Script" uid="uid://chv02urimxmlt" path="res://scripts/minigames/race_game.gd" id="2_3w2rc"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
+bg_color = Color(1, 0.2, 0.2, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p2fill"]
+bg_color = Color(0.2, 0.4, 1, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [node name="RaceGame" instance=ExtResource("1_7f2yl")]
+position = Vector2(652, 348)
 script = ExtResource("2_3w2rc")
+
+[node name="TitleLabel" parent="UI/IntroContainer/VBoxContainer" index="0"]
+text = "Button Mash Race"
+
+[node name="DescriptionLabel" parent="UI/IntroContainer/VBoxContainer" index="2"]
+text = "Mash your action button to reach the finish line first!
+Player 1: Space
+Player 2: Enter"
 
 [node name="ProgressContainer" type="GridContainer" parent="UI" index="3"]
 anchors_preset = 7
@@ -18,17 +41,142 @@ offset_right = 200.0
 offset_bottom = -38.0
 grow_horizontal = 2
 grow_vertical = 0
+theme_override_constants/h_separation = 20
+columns = 2
+
+[node name="Player1ProgressVBox" type="VBoxContainer" parent="UI/ProgressContainer" index="0"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="UI/ProgressContainer/Player1ProgressVBox" index="0"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+text = "Player 1"
+horizontal_alignment = 1
+
+[node name="ProgressBarP1" type="ProgressBar" parent="UI/ProgressContainer/Player1ProgressVBox" index="1"]
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_p1fill")
+max_value = 1000.0
+step = 1.0
+
+[node name="Player2ProgressVBox" type="VBoxContainer" parent="UI/ProgressContainer" index="1"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="UI/ProgressContainer/Player2ProgressVBox" index="0"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.4, 1, 1)
+text = "Player 2"
+horizontal_alignment = 1
+
+[node name="ProgressBarP2" type="ProgressBar" parent="UI/ProgressContainer/Player2ProgressVBox" index="1"]
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_p2fill")
+max_value = 1000.0
+step = 1.0
 
 [node name="GameContainer" type="Control" parent="." index="1"]
 layout_mode = 3
+anchors_preset = 0
+
+[node name="PlayerLanes" type="VBoxContainer" parent="GameContainer" index="0"]
+layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 61.0
-offset_top = 86.0
-offset_right = 1255.0
-offset_bottom = 565.0
+offset_left = -450.0
+offset_top = -150.0
+offset_right = 450.0
+offset_bottom = 100.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 50
+
+[node name="PlayerLane1" type="Control" parent="GameContainer/PlayerLanes" index="0"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TrackLine" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane1" index="0"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 30.0
+offset_right = 850.0
+offset_bottom = 45.0
+mouse_filter = 2
+color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="FinishMarker" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane1" index="1"]
+layout_mode = 0
+offset_left = 845.0
+offset_top = 22.0
+offset_right = 850.0
+offset_bottom = 52.0
+color = Color(1, 1, 0, 1)
+
+[node name="PlayerLabel" type="Label" parent="GameContainer/PlayerLanes/PlayerLane1" index="2"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 37.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 20
+text = "P1"
+
+[node name="PlayerSprite" type="Node2D" parent="GameContainer/PlayerLanes/PlayerLane1" index="3"]
+position = Vector2(50, 30)
+metadata/initial_y = 30
+
+[node name="ColorRect" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane1/PlayerSprite" index="0"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(1, 0.2, 0.2, 1)
+
+[node name="PlayerLane2" type="Control" parent="GameContainer/PlayerLanes" index="1"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TrackLine" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane2" index="0"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 30.0
+offset_right = 850.0
+offset_bottom = 45.0
+mouse_filter = 2
+color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="FinishMarker" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane2" index="1"]
+layout_mode = 0
+offset_left = 845.0
+offset_top = 22.0
+offset_right = 850.0
+offset_bottom = 52.0
+color = Color(1, 1, 0, 1)
+
+[node name="PlayerLabel" type="Label" parent="GameContainer/PlayerLanes/PlayerLane2" index="2"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 37.0
+offset_bottom = 46.0
+theme_override_font_sizes/font_size = 20
+text = "P2"
+
+[node name="PlayerSprite" type="Node2D" parent="GameContainer/PlayerLanes/PlayerLane2" index="3"]
+position = Vector2(50, 30)
+metadata/initial_y = 30
+
+[node name="ColorRect" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane2/PlayerSprite" index="0"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(0.2, 0.4, 1, 1)

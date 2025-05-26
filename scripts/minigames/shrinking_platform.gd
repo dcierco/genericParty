@@ -1,9 +1,10 @@
 extends "res://scripts/minigames/minigame_base.gd"
 
 # Game settings
-var platform_size = Vector2(1000, 1000)  # Larger platform (25x25 cells)
 var cell_size = 40
-var lava_speed = 11.3  # Cells per second (to fill 625 cells in 60 seconds)
+var grid_width = 25
+var grid_height = 25
+var lava_speed = 11.3  # Cells per second (to fill the grid in 60 seconds)
 var push_power = 300.0
 var player_speed = 300.0
 
@@ -13,22 +14,41 @@ var spiral_direction = 0  # 0 = right, 1 = down, 2 = left, 3 = up
 var spiral_length = 1
 var spiral_step_count = 0
 
-# Player colors - same as race game for consistency
-var player_colors = [
-	Color(1, 0.2, 0.2),   # Red (Player 1)
-	Color(0.2, 0.4, 1),   # Blue (Player 2)
-]
-
 # Game state
-var platform
 var lava_cells = []
-var players = []
-var player_inputs = {}
+var player_detailed_scores = {}
 var eliminated_players = {}
 
 # Time tracking
 var shrink_timer = 0.0
 var shrink_interval = 0.0  # Will be calculated in _ready
+
+# Player input mapping
+var player_inputs = {
+	0: {
+		"up": "p1_up",
+		"down": "p1_down",
+		"left": "p1_left",
+		"right": "p1_right",
+		"action": "p1_action",
+		"team": "red"
+	},
+	1: {
+		"up": "p2_up",
+		"down": "p2_down",
+		"left": "p2_left",
+		"right": "p2_right",
+		"action": "p2_action",
+		"team": "blue"
+	}
+}
+
+# Node references
+@onready var platform = $GameContainer/PlatformContainer/Platform
+@onready var player_spawn_points = $GameContainer/PlayerSpawnPoints
+@onready var player1 = $GameContainer/Players/Player1
+@onready var player2 = $GameContainer/Players/Player2
+@onready var debug_info = $GameContainer/DebugInfo
 
 func _ready():
 	print("Shrinking Platform: Ready")
@@ -53,98 +73,70 @@ func initialize_minigame():
 	print("Shrinking Platform: Initializing")
 	super.initialize_minigame()
 	
+	player_detailed_scores.clear()
 	setup_game_area()
 	setup_players()
-	setup_player_inputs()
 	reset_spiral()
 
-# Create the platform and initialize the game area
+# Initialize the platform and game area
 func setup_game_area():
-	# Create a container for the game area
-	var game_container = Control.new()
-	game_container.name = "GameContainer"
-	game_container.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(game_container)
+	# Make sure platform exists
+	if not is_instance_valid(platform):
+		print("Platform not found!")
+		return
+		
+	# Configure platform grid size
+	platform.columns = grid_width
 	
-	# Create a centered container for the platform
-	var platform_container = CenterContainer.new()
-	platform_container.name = "PlatformContainer"
-	platform_container.set_anchors_preset(Control.PRESET_FULL_RECT)
-	game_container.add_child(platform_container)
-	
-	# Create the grid platform
-	platform = GridContainer.new()
-	platform.name = "Platform"
-	platform.columns = int(platform_size.x / cell_size)
-	platform_container.add_child(platform)
+	# Clear any existing cells
+	for child in platform.get_children():
+		child.queue_free()
 	
 	# Add cells to the platform
-	var total_cells = int(platform_size.x / cell_size) * int(platform_size.y / cell_size)
+	var total_cells = grid_width * grid_height
 	for i in range(total_cells):
 		var cell = ColorRect.new()
 		cell.name = "Cell_" + str(i)
 		cell.custom_minimum_size = Vector2(cell_size, cell_size)
 		cell.color = Color(0.8, 0.8, 0.8) # Light gray platform
 		platform.add_child(cell)
+		
+	# Update debug info
+	update_debug_info()
 
-# Configure player input mappings
-func setup_player_inputs():
-	player_inputs = {
-		0: {
-			"up": "p1_up",
-			"down": "p1_down",
-			"left": "p1_left",
-			"right": "p1_right",
-			"action": "p1_action"
-		},
-		1: {
-			"up": "p2_up",
-			"down": "p2_down",
-			"left": "p2_left",
-			"right": "p2_right",
-			"action": "p2_action"
-		}
-	}
-
-# Create player characters
+# Initialize the player characters
 func setup_players():
+	# Get player count
 	var player_count = MinigameManager.get_player_count()
+	player_count = min(player_count, 2)  # Limit to 2 players for this minigame
 	
+	# Reset player1
+	if is_instance_valid(player1):
+		player1.position = player_spawn_points.get_node("Player1Spawn").position
+		player1.set_meta("player_id", 0)
+		player1.set_meta("eliminated", false)
+		player1.visible = true
+		
+		# Update player_teams in the base class for consistency
+		player_teams[0] = player_inputs[0].get("team", "red")
+	
+	# Reset player2
+	if is_instance_valid(player2):
+		player2.position = player_spawn_points.get_node("Player2Spawn").position
+		player2.set_meta("player_id", 1)
+		player2.set_meta("eliminated", false)
+		player2.visible = player_count > 1  # Only show if we have at least 2 players
+		
+		# Update player_teams in the base class for consistency
+		player_teams[1] = player_inputs[1].get("team", "blue")
+	
+	# Initialize player scores
 	for i in range(player_count):
-		var player = CharacterBody2D.new()
-		player.name = "Player" + str(i+1)
-		
-		# Create collision shape
-		var collision = CollisionShape2D.new()
-		var circle_shape = CircleShape2D.new()
-		circle_shape.radius = 15
-		collision.shape = circle_shape
-		player.add_child(collision)
-		
-		# Create sprite
-		var sprite = ColorRect.new()
-		sprite.color = player_colors[i % player_colors.size()]
-		sprite.size = Vector2(30, 30)
-		sprite.position = Vector2(-15, -15)
-		player.add_child(sprite)
-		
-		# Position player in the middle of the platform, slightly offset
-		var offset = Vector2(30 * (i - 0.5), 0)
-		player.position = Vector2(platform_size.x / 2, platform_size.y / 2) + offset
-		
-		# Store player data
-		player.set_meta("player_id", i)
-		player.set_meta("eliminated", false)
-		
-		add_child(player)
-		players.append(player)
+		player_scores[i] = 0
+		player_finished[i] = false
 
 # Reset the spiral parameters to start from the edge
 func reset_spiral():
-	# Start from the top-left corner of the grid
-	var grid_width = int(platform_size.x / cell_size)
-	var grid_height = int(platform_size.y / cell_size)
-	
 	spiral_pos = Vector2(0, 0)
 	spiral_direction = 0  # Start moving right
 	spiral_length = grid_width
@@ -152,14 +144,21 @@ func reset_spiral():
 	
 	# Clear existing lava cells
 	lava_cells.clear()
+	eliminated_players.clear()
+	
+	# Update debug info
+	update_debug_info()
 
 func start_gameplay():
 	print("Shrinking Platform: Starting")
 	super.start_gameplay()
 	
-	# Make all players visible and active
-	for player in players:
-		player.visible = true
+	# Make sure players are visible and active
+	if is_instance_valid(player1):
+		player1.visible = true
+	
+	if is_instance_valid(player2):
+		player2.visible = MinigameManager.get_player_count() > 1
 
 func _process(delta):
 	match current_state:
@@ -193,12 +192,12 @@ func process_playing(delta):
 	
 	# Check if game is over (only one player left)
 	check_game_over()
+	
+	# Update debug info
+	update_debug_info()
 
 # Add a new lava cell at the current spiral position
 func add_lava_cell():
-	var grid_width = int(platform_size.x / cell_size)
-	var grid_height = int(platform_size.y / cell_size)
-	
 	# Calculate cell index
 	var cell_index = int(spiral_pos.y * grid_width + spiral_pos.x)
 	
@@ -237,50 +236,60 @@ func add_lava_cell():
 
 # Process player input and movement
 func process_player_movement(delta):
-	for player in players:
-		if player.get_meta("eliminated"):
-			continue
-			
-		var player_id = player.get_meta("player_id")
-		if not player_inputs.has(player_id):
-			continue
-			
-		var inputs = player_inputs[player_id]
-		var direction = Vector2.ZERO
+	# Handle player 1
+	process_single_player_movement(player1, delta)
+	
+	# Handle player 2
+	process_single_player_movement(player2, delta)
+
+# Process movement for a single player
+func process_single_player_movement(player: CharacterBody2D, delta):
+	if not is_instance_valid(player) or player.get_meta("eliminated"):
+		return
+	
+	var player_id = player.get_meta("player_id")
+	if not player_inputs.has(player_id):
+		return
+	
+	var inputs = player_inputs[player_id]
+	var direction = Vector2.ZERO
+	
+	# Gather input direction
+	if Input.is_action_pressed(inputs["up"]):
+		direction.y -= 1
+	if Input.is_action_pressed(inputs["down"]):
+		direction.y += 1
+	if Input.is_action_pressed(inputs["left"]):
+		direction.x -= 1
+	if Input.is_action_pressed(inputs["right"]):
+		direction.x += 1
 		
-		# Gather input direction
-		if Input.is_action_pressed(inputs["up"]):
-			direction.y -= 1
-			print("Player " + str(player_id + 1) + " moving up")
-		if Input.is_action_pressed(inputs["down"]):
-			direction.y += 1
-			print("Player " + str(player_id + 1) + " moving down")
-		if Input.is_action_pressed(inputs["left"]):
-			direction.x -= 1
-			print("Player " + str(player_id + 1) + " moving left")
-		if Input.is_action_pressed(inputs["right"]):
-			direction.x += 1
-			print("Player " + str(player_id + 1) + " moving right")
-			
-		# Normalize direction for consistent speed
-		if direction.length() > 0:
-			direction = direction.normalized()
-			
-		# Apply movement
-		player.velocity = direction * player_speed
-		player.move_and_slide()
+	# Normalize direction for consistent speed
+	if direction.length() > 0:
+		direction = direction.normalized()
 		
-		# Handle push action
-		if Input.is_action_just_pressed(inputs["action"]):
-			print("Player " + str(player_id + 1) + " pushing")
-			push_other_players(player)
+	# Apply movement
+	player.velocity = direction * player_speed
+	player.move_and_slide()
+	
+	# Handle push action
+	if Input.is_action_just_pressed(inputs["action"]):
+		push_other_players(player)
 
 # Push other players away from this player
 func push_other_players(pusher):
-	for player in players:
-		if player == pusher or player.get_meta("eliminated"):
-			continue
-			
+	var active_players = []
+	
+	# Add player1 if active
+	if is_instance_valid(player1) and not player1.get_meta("eliminated") and player1 != pusher:
+		active_players.append(player1)
+	
+	# Add player2 if active
+	if is_instance_valid(player2) and not player2.get_meta("eliminated") and player2 != pusher:
+		active_players.append(player2)
+	
+	# Push each active player
+	for player in active_players:
 		var distance = player.position.distance_to(pusher.position)
 		if distance < 50:  # Push range
 			var push_direction = (player.position - pusher.position).normalized()
@@ -289,30 +298,37 @@ func push_other_players(pusher):
 
 # Check if any players are touching lava
 func check_player_eliminations():
-	var grid_width = int(platform_size.x / cell_size)
+	# Check player 1
+	check_single_player_elimination(player1)
 	
-	for player in players:
-		if player.get_meta("eliminated"):
-			continue
-			
-		# Get the cell the player is on
-		var player_pos = player.position - platform.global_position
-		var cell_x = int(player_pos.x / cell_size)
-		var cell_y = int(player_pos.y / cell_size)
+	# Check player 2
+	check_single_player_elimination(player2)
+
+# Check if a single player is touching lava
+func check_single_player_elimination(player: CharacterBody2D):
+	if not is_instance_valid(player) or player.get_meta("eliminated"):
+		return
 		
-		# Keep within bounds
-		cell_x = clamp(cell_x, 0, grid_width - 1)
-		cell_y = clamp(cell_y, 0, int(platform_size.y / cell_size) - 1)
+	# Get the cell the player is on
+	var player_pos = player.position - platform.global_position
+	var cell_x = int(player_pos.x / cell_size)
+	var cell_y = int(player_pos.y / cell_size)
+	
+	# Keep within bounds
+	cell_x = clamp(cell_x, 0, grid_width - 1)
+	cell_y = clamp(cell_y, 0, grid_height - 1)
+	
+	var cell_index = cell_y * grid_width + cell_x
+	
+	# Check if player is on a lava cell
+	if cell_index in lava_cells:
+		eliminate_player(player)
 		
-		var cell_index = cell_y * grid_width + cell_x
-		
-		# Check if player is on a lava cell
-		if cell_index in lava_cells:
-			eliminate_player(player)
-		
-		# Also check if player is out of bounds
-		if player_pos.x < 0 or player_pos.x >= platform_size.x or player_pos.y < 0 or player_pos.y >= platform_size.y:
-			eliminate_player(player)
+	# Also check if player is out of bounds
+	var platform_width = grid_width * cell_size
+	var platform_height = grid_height * cell_size
+	if player_pos.x < 0 or player_pos.x >= platform_width or player_pos.y < 0 or player_pos.y >= platform_height:
+		eliminate_player(player)
 
 # Eliminate a player who fell into lava
 func eliminate_player(player):
@@ -325,31 +341,54 @@ func eliminate_player(player):
 	var player_id = player.get_meta("player_id")
 	eliminated_players[player_id] = true
 	
-	print("Player " + str(player_id + 1) + " eliminated!")
+	# Calculate survival score: percentage of platform consumed when eliminated
+	var survival_score = int((float(lava_cells.size()) / (grid_width * grid_height)) * 100)
+	
+	# Store detailed score breakdown
+	player_detailed_scores[player_id] = {
+		"survival": survival_score,
+		"win_bonus": 0, # No win bonus yet (will be set for last player standing)
+		"total": survival_score
+	}
+	
+	var team = player_teams.get(player_id, "red")
+	print("Player " + str(player_id + 1) + " (Team " + team + ") eliminated! Survival score: " + str(survival_score))
 
 # Check if game should end
 func check_game_over():
-	var remaining_players = 0
+	var active_players = []
 	var last_player_standing = -1
 	
-	for player in players:
-		if not player.get_meta("eliminated"):
-			remaining_players += 1
-			last_player_standing = player.get_meta("player_id")
+	# Check player 1
+	if is_instance_valid(player1) and not player1.get_meta("eliminated"):
+		active_players.append(player1)
+		last_player_standing = player1.get_meta("player_id")
 	
-	if remaining_players <= 1 or (eliminated_players.size() > 0 and eliminated_players.size() >= players.size() - 1):
-		# Award score to last player, if any
+	# Check player 2
+	if is_instance_valid(player2) and not player2.get_meta("eliminated"):
+		active_players.append(player2)
+		last_player_standing = player2.get_meta("player_id")
+	
+	var player_count = MinigameManager.get_player_count()
+	player_count = min(player_count, 2)
+	
+	if active_players.size() <= 1 and eliminated_players.size() > 0:
+		# Award score to last player standing
 		if last_player_standing >= 0:
-			var score = 100
-			set_player_finished(last_player_standing, score)
-		
-		# Give scores to eliminated players based on elimination order
-		var rank = 2
-		for player_id in eliminated_players:
-			if not player_finished.get(player_id, false):
-				var score = max(0, (players.size() - rank + 1) * 50)
-				set_player_finished(player_id, score)
-				rank += 1
+			# Calculate win bonus: 100 points for winning + percentage of platform consumed
+			var survival_score = int((float(lava_cells.size()) / (grid_width * grid_height)) * 100)
+			var win_bonus = 100
+			var total_score = survival_score + win_bonus
+			
+			# Store detailed score breakdown
+			player_detailed_scores[last_player_standing] = {
+				"survival": survival_score,
+				"win_bonus": win_bonus,
+				"total": total_score
+			}
+			
+			# Mark as finished with total score
+			set_player_finished(last_player_standing, total_score)
 		
 		# End the minigame
 		print("Shrinking Platform: Game over, last player standing: " + str(last_player_standing + 1))
@@ -358,10 +397,146 @@ func check_game_over():
 func process_finished(delta):
 	super.process_finished(delta)
 
-# Clean up when scene is removed
-func _exit_tree():
-	print("Shrinking Platform: Cleaning up")
-	eliminated_players.clear()
-	lava_cells.clear()
-	player_inputs.clear()
-	players.clear() 
+# Display debug info about platform state
+func update_debug_info():
+	if is_instance_valid(debug_info):
+		debug_info.text = "Platform Cells: " + str(platform.get_child_count()) + "\n"
+		debug_info.text += "Lava Cells: " + str(lava_cells.size()) + "\n"
+		debug_info.text += "Spiral Position: (" + str(spiral_pos.x) + "," + str(spiral_pos.y) + ")"
+
+# End the minigame and calculate results
+func end_minigame():
+	print("Shrinking Platform: Game over")
+	
+	# Make sure we only end the game once
+	if current_state == MinigameState.FINISHED or current_state == MinigameState.RESULTS:
+		print("Shrinking Platform: Already finished, ignoring duplicate end_minigame call")
+		return
+	
+	# Complete any unfinished players with their current progress
+	var player_count = MinigameManager.get_player_count()
+	player_count = min(player_count, 2)
+	
+	for player_id in range(player_count):
+		if not player_finished.get(player_id, false):
+			# Calculate score based on survival
+			var survival_score = int((float(lava_cells.size()) / (grid_width * grid_height)) * 100)
+			
+			# Store detailed score breakdown
+			player_detailed_scores[player_id] = {
+				"survival": survival_score,
+				"win_bonus": 0, # No win bonus for not finishing
+				"total": survival_score
+			}
+			
+			# Mark as finished with current score
+			set_player_finished(player_id, survival_score)
+	
+	# Let the base class handle results display and transitioning
+	super.end_minigame()
+
+# Override the display_results function to show team-based results
+func display_results():
+	# Base class will handle making the container visible
+	
+	# Get the results list before calling super (which will clear it)
+	var results_list = $UI/ResultsContainer/VBoxContainer/ResultsList
+	if results_list:
+		# Clear existing results
+		for child in results_list.get_children():
+			child.queue_free()
+	
+	# Calculate team results first using base class implementation
+	super.display_results()
+	
+	# Get team panels and labels
+	var red_team_panel = $UI/ResultsContainer/VBoxContainer/TeamResultsContainer/RedTeamPanel
+	var blue_team_panel = $UI/ResultsContainer/VBoxContainer/TeamResultsContainer/BlueTeamPanel
+	var red_team_label = $UI/ResultsContainer/VBoxContainer/TeamResultsContainer/RedTeamPanel/RedTeamLabel
+	var blue_team_label = $UI/ResultsContainer/VBoxContainer/TeamResultsContainer/BlueTeamPanel/BlueTeamLabel
+	
+	# Add platform-specific info to team labels
+	if red_team_label and blue_team_label:
+		# Check who survived longer
+		var red_survived = not eliminated_players.has(0) 
+		var blue_survived = not eliminated_players.has(1)
+		
+		# Enhance the win/lose message with platform details
+		if red_survived and not blue_survived:
+			red_team_label.text = "RED TEAM WINS\nLast one standing!"
+			blue_team_label.text = "BLUE TEAM LOSES\nFell into lava!"
+		elif blue_survived and not red_survived:
+			blue_team_label.text = "BLUE TEAM WINS\nLast one standing!"
+			red_team_label.text = "RED TEAM LOSES\nFell into lava!"
+		else:
+			# Both fell or both survived (time ran out)
+			if team_scores["red"] > team_scores["blue"]:
+				red_team_label.text = "RED TEAM WINS\nSurvived longer!"
+				blue_team_label.text = "BLUE TEAM LOSES\nFell earlier!"
+			else:
+				blue_team_label.text = "BLUE TEAM WINS\nSurvived longer!"
+				red_team_label.text = "RED TEAM LOSES\nFell earlier!"
+	
+	# Add detailed player score breakdowns to results list
+	if results_list:
+		# Get sorted player ranking
+		var ranking = get_player_ranking()
+		
+		# Add player results with detailed breakdown
+		for player_data in ranking:
+			var player_id = player_data.player_id
+			var team = player_teams.get(player_id, "red")
+			
+			# Create VBox for this player's results
+			var player_results = VBoxContainer.new()
+			player_results.add_theme_constant_override("separation", 5)
+			
+			# Player header
+			var player_header = Label.new()
+			player_header.text = "Player " + str(player_id + 1) + " (" + team.capitalize() + " Team)"
+			player_header.add_theme_font_size_override("font_size", 18)
+			player_header.add_theme_color_override("font_color", team_colors[team])
+			player_results.add_child(player_header)
+			
+			# Score breakdown
+			if player_detailed_scores.has(player_id):
+				var score_data = player_detailed_scores[player_id]
+				
+				# Survival points
+				var survival_label = Label.new()
+				survival_label.text = "+ " + str(score_data.survival) + " points (survived " + str(score_data.survival) + "% of platform collapse)"
+				player_results.add_child(survival_label)
+				
+				# Win bonus if applicable
+				if score_data.win_bonus > 0:
+					var bonus_label = Label.new()
+					bonus_label.text = "+ " + str(score_data.win_bonus) + " points (last survivor bonus)"
+					bonus_label.add_theme_color_override("font_color", Color(1, 0.8, 0))
+					player_results.add_child(bonus_label)
+				
+				# Total
+				var total_label = Label.new()
+				total_label.text = "Total: " + str(score_data.total) + " points"
+				total_label.add_theme_font_size_override("font_size", 16)
+				total_label.add_theme_color_override("font_color", Color(1, 1, 1))
+				player_results.add_child(total_label)
+			
+			# Add to results list
+			results_list.add_child(player_results)
+			
+			# Add spacer
+			var spacer = HSeparator.new()
+			results_list.add_child(spacer)
+	
+	# Animate the results panels
+	if red_team_panel and blue_team_panel:
+		# Create a single tween for both panels to ensure proper sequencing
+		var tween = create_tween()
+		
+		# First, make panels pulse by scaling
+		tween.tween_property(red_team_panel, "modulate", Color(1.2, 1.2, 1.2, 1), 0.5)
+		tween.parallel().tween_property(blue_team_panel, "modulate", Color(1.2, 1.2, 1.2, 1), 0.5)
+		
+		# Then back to normal
+		tween.tween_property(red_team_panel, "modulate", Color(1, 1, 1, 1), 0.5)
+		tween.parallel().tween_property(blue_team_panel, "modulate", Color(1, 1, 1, 1), 0.5)

@@ -36,6 +36,14 @@ func register_all_minigames():
 		"Stay on the platform as it shrinks! Push opponents into the lava!\nControls:\nPlayer 1: WASD (move) + Space (push)\nPlayer 2: Arrow Keys (move) + Enter (push)"
 	)
 
+	# Register Avoid the Obstacles game
+	register_minigame(
+		"avoid_the_obstacles",
+		"res://scenes/minigames/avoid_the_obstacles.tscn",
+		"Avoid the Obstacles!",
+		"Dodge the falling objects! Last player standing wins, or survive together!\nControls:\nPlayer 1: A/D (move) + Space (jump)\nPlayer 2: Left/Right Arrows (move) + Enter (jump)"
+	)
+
 func register_minigame(id: String, scene_path: String, display_name: String, description: String):
 	available_minigames[id] = {
 		"scene": scene_path,
