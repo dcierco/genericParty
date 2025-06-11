@@ -17,6 +17,9 @@ func _ready():
 	
 	# Populate minigame list
 	populate_minigame_list()
+	
+	# Start background music
+	$BackgroundMusic.play()
 
 # Fill the list with available minigames
 func populate_minigame_list():
@@ -103,6 +106,11 @@ func _on_minigame_completed(_results):
 	# Re-enable buttons
 	play_button.disabled = false
 	random_button.disabled = false
+	
+	# Start background music
+	AudioServer.set_bus_volume_linear(2, 0)
+	AudioServer.set_bus_volume_linear(1, 0.6)
+	$BackgroundMusic.play()
 	
 	# Update description to show last result
 	if not _results.is_empty():

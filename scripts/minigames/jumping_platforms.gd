@@ -1,7 +1,7 @@
 extends "res://scripts/minigames/minigame_base.gd"
 
 # Player settings
-const PLAYER_HORIZONTAL_SPEED = 300.0
+const PLAYER_SPEED = 300.0
 const JUMP_VELOCITY = -700.0 
 const PLAYER_GRAVITY_SCALE = 1.2
 const PUSH_POWER = 4000.0
@@ -40,24 +40,6 @@ var eliminated_players = {}
 @onready var height_label_p1 = $UI/HeightContainer/Player1HeightLabel
 @onready var height_label_p2 = $UI/HeightContainer/Player2HeightLabel
 
-# Player input mapping
-var player_input_map = {
-	0: {
-		"left": "p1_left", 
-		"right": "p1_right", 
-		"jump": "p1_up",
-		"push": "p1_action",
-		"team": "red"
-	},
-	1: {
-		"left": "p2_left", 
-		"right": "p2_right", 
-		"jump": "p2_up",
-		"push": "p2_action",
-		"team": "blue"
-	}
-}
-
 func _ready():
 	minigame_id = "jumping_platforms"
 	minigame_name = "Jumping Platforms!"
@@ -67,6 +49,8 @@ func _ready():
 	has_time_limit = true
 
 	super._ready()
+	
+	$BackgroundMusic.play()
 
 	if description_label:
 		description_label.text = minigame_description
@@ -113,17 +97,19 @@ func setup_players():
 	if is_instance_valid(player1):
 		player1.position = $GameContainer/PlayerSpawnPositions/P1Spawn.position
 		player1.visible = true
-		player1.set_meta("player_id", 0)
+		player1.set_meta("speed", PLAYER_SPEED)
+		player1.set_meta("jump_velocity", JUMP_VELOCITY)
+		player1.set_meta("player_gravity_scale", PLAYER_GRAVITY_SCALE)
 		player1.set_meta("eliminated", false)
-		player_teams[0] = player_input_map[0].get("team", "red")
 	
 	# Setup player 2
 	if is_instance_valid(player2):
 		player2.position = $GameContainer/PlayerSpawnPositions/P2Spawn.position
 		player2.visible = player_count > 1
-		player2.set_meta("player_id", 1)
+		player2.set_meta("speed", PLAYER_SPEED)
+		player2.set_meta("jump_velocity", JUMP_VELOCITY)
+		player2.set_meta("player_gravity_scale", PLAYER_GRAVITY_SCALE)
 		player2.set_meta("eliminated", false)
-		player_teams[1] = player_input_map[1].get("team", "blue")
 	
 	# Initialize player scores
 	for i in range(player_count):
@@ -186,10 +172,6 @@ func start_gameplay():
 func _physics_process(delta):
 	if current_state != MinigameState.PLAYING:
 		return
-		
-	# Handle player movement
-	process_player_movement(player1, 0, delta)
-	process_player_movement(player2, 1, delta)
 	
 	# Update highest player position
 	update_highest_player_position()
@@ -203,46 +185,6 @@ func _physics_process(delta):
 	# Update UI displays
 	update_height_displays()
 	update_debug_display()
-
-func process_player_movement(player: CharacterBody2D, player_id: int, delta: float):
-	if not is_instance_valid(player) or player.get_meta("eliminated") or not player.visible:
-		return
-		
-	var inputs = player_input_map.get(player_id)
-	if not inputs:
-		return
-	
-	var velocity = player.velocity
-	
-	# Apply gravity
-	var gravity = ProjectSettings.get_setting("physics/2d/default_gravity", 980)
-	if not player.is_on_floor():
-		velocity.y += gravity * PLAYER_GRAVITY_SCALE * delta
-	
-	# Horizontal movement
-	var direction = 0
-	if Input.is_action_pressed(inputs.left):
-		direction -= 1
-	if Input.is_action_pressed(inputs.right):
-		direction += 1
-	
-	velocity.x = direction * PLAYER_HORIZONTAL_SPEED
-	
-	# Jump
-	if Input.is_action_just_pressed(inputs.jump) and player.is_on_floor():
-		velocity.y = JUMP_VELOCITY
-	
-	# Push action
-	if Input.is_action_just_pressed(inputs.push):
-		push_other_players(player, player_id)
-	
-	# Apply movement
-	player.velocity = velocity
-	player.move_and_slide()
-	
-	# Update player height score (now based on ground level at y=700)
-	var height_meters = (700 - player.position.y) / 50.0  # Convert pixels to "meters" from ground
-	player_heights[player_id] = max(player_heights[player_id], height_meters)
 
 func push_other_players(pusher: CharacterBody2D, pusher_id: int):
 	var other_player = player2 if pusher_id == 0 else player1
@@ -309,7 +251,7 @@ func eliminate_player(player_id):
 		return
 	
 	print("Player " + str(player_id + 1) + " eliminated for falling behind!")
-	player.set_meta("eliminated", true)
+	player.eliminate()
 	player.visible = false
 	
 	# Calculate final score

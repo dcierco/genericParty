@@ -17,7 +17,11 @@ func _ready():
 	
 	# Remove setting default values
 	# player_count_spinner.value = 4
-	# turn_count_spinner.value = 10
+	# turn_count_spinner.value = 1
+	
+	# Start background music
+	AudioServer.set_bus_volume_linear(1, 0.6)
+	$BackgroundMusic.play()
 
 # Remove board game start function
 # func _on_start_button_pressed():

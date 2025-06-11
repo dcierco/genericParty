@@ -1,6 +1,5 @@
 @tool
 extends Node2D
-class_name PlayerToken
 
 # Player properties
 @export var player_id: int = 0
@@ -8,8 +7,6 @@ class_name PlayerToken
 @export var player_color: Color = Color(1, 0, 0)  # Default red
 
 # Visual elements
-@onready var sprite = $Sprite2D
-@onready var color_rect = $Sprite2D/ColorRect
 @onready var name_label = $NameLabel
 
 func _ready():
@@ -29,22 +26,6 @@ func setup_visuals():
 			player_color = Color(1, 0.9, 0.2)
 	
 	print("Setting up player " + str(player_id) + " visuals with color " + str(player_color))
-	
-	# Apply color to ColorRect
-	if color_rect:
-		color_rect.color = player_color
-		print("Applied color to ColorRect")
-	else:
-		print("ColorRect not found!")
-		# Try to find ColorRect
-		for child in get_children():
-			if child is Sprite2D:
-				for subchild in child.get_children():
-					if subchild is ColorRect:
-						color_rect = subchild
-						color_rect.color = player_color
-						print("Found ColorRect in children")
-						break
 	
 	# Set name label
 	if name_label:

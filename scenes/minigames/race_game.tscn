@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://cw4cbf0gvsnuw"]
+[gd_scene load_steps=6 format=3 uid="uid://cw4cbf0gvsnuw"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_7f2yl"]
 [ext_resource type="Script" uid="uid://chv02urimxmlt" path="res://scripts/minigames/race_game.gd" id="2_3w2rc"]
+[ext_resource type="AudioStream" uid="uid://6mnl3iv8u4lw" path="res://sfx/17 - Fight.ogg" id="3_c1ur1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
 bg_color = Color(1, 0.2, 0.2, 1)
@@ -180,3 +181,7 @@ offset_top = -20.0
 offset_right = 20.0
 offset_bottom = 20.0
 color = Color(0.2, 0.4, 1, 1)
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
+stream = ExtResource("3_c1ur1")
+bus = &"Minigames BGM"

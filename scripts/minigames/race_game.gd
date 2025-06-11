@@ -38,6 +38,8 @@ func _ready():
 	
 	super._ready()
 	
+	$BackgroundMusic.play()
+	
 	# Update description label if needed
 	if description_label:
 		description_label.text = minigame_description

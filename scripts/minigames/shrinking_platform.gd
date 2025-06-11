@@ -5,8 +5,6 @@ var cell_size = 40
 var grid_width = 25
 var grid_height = 25
 var lava_speed = 11.3  # Cells per second (to fill the grid in 60 seconds)
-var push_power = 600.0
-var player_speed = 300.0
 
 # Spiral shrinking parameters
 var spiral_pos = Vector2.ZERO
@@ -23,25 +21,9 @@ var eliminated_players = {}
 var shrink_timer = 0.0
 var shrink_interval = 0.0  # Will be calculated in _ready
 
-# Player input mapping
-var player_inputs = {
-	0: {
-		"up": "p1_up",
-		"down": "p1_down",
-		"left": "p1_left",
-		"right": "p1_right",
-		"action": "p1_action",
-		"team": "red"
-	},
-	1: {
-		"up": "p2_up",
-		"down": "p2_down",
-		"left": "p2_left",
-		"right": "p2_right",
-		"action": "p2_action",
-		"team": "blue"
-	}
-}
+# Player settings
+const PLAYER_SPEED = 250.0
+var push_power = 600.0
 
 # Node references
 @onready var platform = $GameContainer/PlatformContainer/Platform
@@ -64,6 +46,8 @@ func _ready():
 	shrink_interval = 1.0 / lava_speed  # Duration between adding lava cells
 	
 	super._ready()
+	
+	$BackgroundMusic.play()
 	
 	# Update description label
 	if description_label:
@@ -113,22 +97,16 @@ func setup_players():
 	# Reset player1
 	if is_instance_valid(player1):
 		player1.position = player_spawn_points.get_node("Player1Spawn").position
-		player1.set_meta("player_id", 0)
+		player1.set_meta("speed", PLAYER_SPEED)
 		player1.set_meta("eliminated", false)
 		player1.visible = true
-		
-		# Update player_teams in the base class for consistency
-		player_teams[0] = player_inputs[0].get("team", "red")
 	
 	# Reset player2
 	if is_instance_valid(player2):
 		player2.position = player_spawn_points.get_node("Player2Spawn").position
-		player2.set_meta("player_id", 1)
+		player1.set_meta("speed", PLAYER_SPEED)
 		player2.set_meta("eliminated", false)
 		player2.visible = player_count > 1  # Only show if we have at least 2 players
-		
-		# Update player_teams in the base class for consistency
-		player_teams[1] = player_inputs[1].get("team", "blue")
 	
 	# Initialize player scores
 	for i in range(player_count):
@@ -184,9 +162,6 @@ func process_playing(delta):
 		shrink_timer = 0
 		add_lava_cell()
 	
-	# Process player movement and collisions
-	process_player_movement(delta)
-	
 	# Check if players are in lava
 	check_player_eliminations()
 	
@@ -233,48 +208,6 @@ func add_lava_cell():
 	# Ensure we stay within bounds
 	spiral_pos.x = clamp(spiral_pos.x, 0, grid_width - 1)
 	spiral_pos.y = clamp(spiral_pos.y, 0, grid_height - 1)
-
-# Process player input and movement
-func process_player_movement(delta):
-	# Handle player 1
-	process_single_player_movement(player1, delta)
-	
-	# Handle player 2
-	process_single_player_movement(player2, delta)
-
-# Process movement for a single player
-func process_single_player_movement(player: CharacterBody2D, delta):
-	if not is_instance_valid(player) or player.get_meta("eliminated"):
-		return
-	
-	var player_id = player.get_meta("player_id")
-	if not player_inputs.has(player_id):
-		return
-	
-	var inputs = player_inputs[player_id]
-	var direction = Vector2.ZERO
-	
-	# Gather input direction
-	if Input.is_action_pressed(inputs["up"]):
-		direction.y -= 1
-	if Input.is_action_pressed(inputs["down"]):
-		direction.y += 1
-	if Input.is_action_pressed(inputs["left"]):
-		direction.x -= 1
-	if Input.is_action_pressed(inputs["right"]):
-		direction.x += 1
-		
-	# Normalize direction for consistent speed
-	if direction.length() > 0:
-		direction = direction.normalized()
-		
-	# Apply movement
-	player.velocity = direction * player_speed
-	player.move_and_slide()
-	
-	# Handle push action
-	if Input.is_action_just_pressed(inputs["action"]):
-		push_other_players(player)
 
 # Push other players away from this player
 func push_other_players(pusher):
@@ -335,10 +268,10 @@ func eliminate_player(player):
 	if player.get_meta("eliminated"):
 		return
 		
-	player.set_meta("eliminated", true)
+	player.eliminate()
 	player.visible = false
 	
-	var player_id = player.get_meta("player_id")
+	var player_id = player.player_id
 	eliminated_players[player_id] = true
 	
 	# Calculate survival score: percentage of platform consumed when eliminated
