@@ -301,7 +301,7 @@ func spawn_obstacle():
 	
 	if random_value < 0.4:  # 40% chance for side obstacle
 		obstacle_type = 1
-	elif random_value < 0.25:  # 5% chance for sine wave obstacle
+	elif random_value < 0.5:  # 5% chance for sine wave obstacle
 		obstacle_type = 2
 	
 	# Setup physics
@@ -315,8 +315,13 @@ func spawn_obstacle():
 	obstacle.set_meta("type", obstacle_type)
 	if obstacle_type == 2:  # Sine wave
 		obstacle.set_meta("sine_time", 0.0)
-		obstacle.set_meta("sine_amplitude", randf_range(50, 100))
-		obstacle.set_meta("sine_frequency", randf_range(2, 4))
+		obstacle.set_meta("sine_amplitude", randf_range(30, 100))  # How much it moves up/down
+		obstacle.set_meta("sine_frequency", randf_range(1.5, 5.0))  # How fast it oscillates
+		# Some obstacles have no slope (straight), others have slope
+		var slope = 0.0
+		if randf() > 0.3:  # 70% chance to have slope
+			slope = randf_range(-0.3, 0.3)
+		obstacle.set_meta("sine_slope", slope)  # Vertical slope while moving horizontally
 	
 	# Create collision shape
 	var collision = CollisionShape2D.new()
@@ -388,16 +393,19 @@ func spawn_obstacle():
 			obstacle.global_position = Vector2(1330, y_pos)
 			obstacle.linear_velocity = Vector2(randf_range(-300, -200), 0)  # Move left
 	else:  # Sine wave
-		# Similar to side obstacle but will move in sine pattern
+		# Spawn at same height as side obstacles
 		var from_left = randf() > 0.5
-		var y_pos = randf_range(200, 500)  # Somewhere in the middle of the screen
+		var y_pos = ground_node.global_position.y - 15  # Same as side obstacles
+		
+		# Store initial center position for sine wave calculations
+		obstacle.set_meta("initial_y", y_pos)
 		
 		if from_left:
 			obstacle.global_position = Vector2(-50, y_pos)
-			obstacle.linear_velocity = Vector2(randf_range(150, 250), 0)  # Move right
+			obstacle.linear_velocity = Vector2(randf_range(120, 280), 0)  # Varying horizontal speed
 		else:
 			obstacle.global_position = Vector2(1330, y_pos)
-			obstacle.linear_velocity = Vector2(randf_range(-250, -150), 0)  # Move left
+			obstacle.linear_velocity = Vector2(randf_range(-280, -120), 0)  # Varying horizontal speed
 	
 	# Add auto-cleanup when obstacle exits screen
 	var visibility_notifier = VisibleOnScreenNotifier2D.new()
@@ -499,14 +507,22 @@ func update_sine_obstacles(delta):
 			
 			var amplitude = obstacle.get_meta("sine_amplitude")
 			var frequency = obstacle.get_meta("sine_frequency")
+			var slope = obstacle.get_meta("sine_slope")
+			var initial_y = obstacle.get_meta("initial_y")
 			
-			# Calculate vertical offset based on sine wave
-			var vertical_offset = sin(sine_time * frequency) * amplitude
+			# Calculate sine wave position
+			var sine_offset = sin(sine_time * frequency) * amplitude
 			
-			# Apply vertical offset while maintaining horizontal velocity
+			# Add slope component (gradual rise/fall over time)
+			var slope_offset = slope * sine_time * 20  # Scale slope effect
+			
+			# Set position relative to initial center position
+			var target_y = initial_y + sine_offset + slope_offset
+			obstacle.position.y = target_y
+			
+			# Maintain horizontal velocity only
 			var current_velocity = obstacle.linear_velocity
-			obstacle.position.y = obstacle.position.y + vertical_offset * delta
-			obstacle.linear_velocity = Vector2(current_velocity.x, 0)  # Maintain horizontal velocity only
+			obstacle.linear_velocity = Vector2(current_velocity.x, 0)
 
 func end_minigame():
 	if current_state == MinigameState.FINISHED or current_state == MinigameState.RESULTS:
