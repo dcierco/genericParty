@@ -23,7 +23,9 @@ var shrink_interval = 0.0  # Will be calculated in _ready
 
 # Player settings
 const PLAYER_SPEED = 250.0
-var push_power = 600.0
+const PUSH_POWER = 4000.0
+
+const PUSH_RANGE = 50
 
 # Node references
 @onready var platform = $GameContainer/PlatformContainer/Platform
@@ -97,15 +99,15 @@ func setup_players():
 	# Reset player1
 	if is_instance_valid(player1):
 		player1.position = player_spawn_points.get_node("Player1Spawn").position
-		player1.set_meta("speed", PLAYER_SPEED)
-		player1.set_meta("eliminated", false)
+		player1.speed = PLAYER_SPEED
+		player1.eliminated = false
 		player1.visible = true
 	
 	# Reset player2
 	if is_instance_valid(player2):
 		player2.position = player_spawn_points.get_node("Player2Spawn").position
-		player1.set_meta("speed", PLAYER_SPEED)
-		player2.set_meta("eliminated", false)
+		player1.speed = PLAYER_SPEED
+		player2.eliminated = false
 		player2.visible = player_count > 1  # Only show if we have at least 2 players
 	
 	# Initialize player scores
@@ -162,6 +164,9 @@ func process_playing(delta):
 		shrink_timer = 0
 		add_lava_cell()
 	
+	# Check push
+	check_push()
+	
 	# Check if players are in lava
 	check_player_eliminations()
 	
@@ -209,25 +214,32 @@ func add_lava_cell():
 	spiral_pos.x = clamp(spiral_pos.x, 0, grid_width - 1)
 	spiral_pos.y = clamp(spiral_pos.y, 0, grid_height - 1)
 
+func check_push():
+	if Input.is_action_just_pressed("p1_action"):
+		push_other_players(player1)
+		
+	if Input.is_action_just_pressed("p2_action"):
+		push_other_players(player2)
+
 # Push other players away from this player
 func push_other_players(pusher):
 	var active_players = []
 	
 	# Add player1 if active
-	if is_instance_valid(player1) and not player1.get_meta("eliminated") and player1 != pusher:
+	if is_instance_valid(player1) and not player1.eliminated and player1 != pusher:
 		active_players.append(player1)
 	
 	# Add player2 if active
-	if is_instance_valid(player2) and not player2.get_meta("eliminated") and player2 != pusher:
+	if is_instance_valid(player2) and not player2.eliminated and player2 != pusher:
 		active_players.append(player2)
 	
 	# Push each active player
 	for player in active_players:
 		var distance = player.position.distance_to(pusher.position)
-		if distance < 50:  # Push range
+		if distance < PUSH_RANGE:  # Push range
 			var push_direction = (player.position - pusher.position).normalized()
-			player.position += push_direction * push_power * 0.05  # Small immediate push
-			player.velocity += push_direction * push_power
+			player.position += push_direction * PUSH_POWER * 0.05  # Small immediate push
+			player.velocity += push_direction * PUSH_POWER
 
 # Check if any players are touching lava
 func check_player_eliminations():
@@ -239,7 +251,7 @@ func check_player_eliminations():
 
 # Check if a single player is touching lava
 func check_single_player_elimination(player: CharacterBody2D):
-	if not is_instance_valid(player) or player.get_meta("eliminated"):
+	if not is_instance_valid(player) or player.eliminated:
 		return
 		
 	# Get the cell the player is on
@@ -265,7 +277,7 @@ func check_single_player_elimination(player: CharacterBody2D):
 
 # Eliminate a player who fell into lava
 func eliminate_player(player):
-	if player.get_meta("eliminated"):
+	if player.eliminated:
 		return
 		
 	player.eliminate()
@@ -293,14 +305,14 @@ func check_game_over():
 	var last_player_standing = -1
 	
 	# Check player 1
-	if is_instance_valid(player1) and not player1.get_meta("eliminated"):
+	if is_instance_valid(player1) and not player1.eliminated:
 		active_players.append(player1)
-		last_player_standing = player1.get_meta("player_id")
+		last_player_standing = player1.player_id
 	
 	# Check player 2
-	if is_instance_valid(player2) and not player2.get_meta("eliminated"):
+	if is_instance_valid(player2) and not player2.eliminated:
 		active_players.append(player2)
-		last_player_standing = player2.get_meta("player_id")
+		last_player_standing = player2.player_id
 	
 	var player_count = MinigameManager.get_player_count()
 	player_count = min(player_count, 2)

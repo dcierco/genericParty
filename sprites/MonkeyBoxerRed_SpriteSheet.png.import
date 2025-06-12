@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://f83hks1arh2y"
-path="res://.godot/imported/MonkeyBoxerRed_SpriteSheet.png-441e8907bb738e7b8c16a06de6ecedaf.ctex"
+uid="uid://dnygpdpfv7h43"
+path="res://.godot/imported/MonkeyBoxerRed_SpriteSheet.png-ea8ad0ed8ca9ef13b22b1e378aba266e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://players/MonkeyBoxerRed_SpriteSheet.png"
-dest_files=["res://.godot/imported/MonkeyBoxerRed_SpriteSheet.png-441e8907bb738e7b8c16a06de6ecedaf.ctex"]
+source_file="res://sprites/MonkeyBoxerRed_SpriteSheet.png"
+dest_files=["res://.godot/imported/MonkeyBoxerRed_SpriteSheet.png-ea8ad0ed8ca9ef13b22b1e378aba266e.ctex"]
 
 [params]
 

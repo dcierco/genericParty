@@ -1,8 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cw4cbf0gvsnuw"]
+[gd_scene load_steps=18 format=3 uid="uid://cw4cbf0gvsnuw"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_7f2yl"]
 [ext_resource type="Script" uid="uid://chv02urimxmlt" path="res://scripts/minigames/race_game.gd" id="2_3w2rc"]
-[ext_resource type="AudioStream" uid="uid://6mnl3iv8u4lw" path="res://sfx/17 - Fight.ogg" id="3_c1ur1"]
+[ext_resource type="Texture2D" uid="uid://dnygpdpfv7h43" path="res://sprites/MonkeyBoxerRed_SpriteSheet.png" id="3_m5c4s"]
+[ext_resource type="Texture2D" uid="uid://1tw38874xosb" path="res://sprites/MonkeyBoxerBlue_SpriteSheet.png" id="4_a4idd"]
+[ext_resource type="AudioStream" uid="uid://6mnl3iv8u4lw" path="res://sfx/17 - Fight.ogg" id="5_a4idd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
 bg_color = Color(1, 0.2, 0.2, 1)
@@ -17,6 +19,78 @@ corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7taso"]
+atlas = ExtResource("3_m5c4s")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jeo6c"]
+atlas = ExtResource("3_m5c4s")
+region = Rect2(144, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tisnt"]
+atlas = ExtResource("3_m5c4s")
+region = Rect2(144, 96, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j6p88"]
+atlas = ExtResource("3_m5c4s")
+region = Rect2(144, 144, 48, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_nrdyo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7taso")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jeo6c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tisnt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j6p88")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gacb0"]
+atlas = ExtResource("4_a4idd")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ini20"]
+atlas = ExtResource("4_a4idd")
+region = Rect2(144, 48, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_434mx"]
+atlas = ExtResource("4_a4idd")
+region = Rect2(144, 96, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jt4tn"]
+atlas = ExtResource("4_a4idd")
+region = Rect2(144, 144, 48, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qjobc"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gacb0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ini20")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_434mx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jt4tn")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
 
 [node name="RaceGame" instance=ExtResource("1_7f2yl")]
 position = Vector2(652, 348)
@@ -133,12 +207,8 @@ text = "P1"
 position = Vector2(50, 30)
 metadata/initial_y = 30
 
-[node name="ColorRect" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane1/PlayerSprite" index="0"]
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-color = Color(1, 0.2, 0.2, 1)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="GameContainer/PlayerLanes/PlayerLane1/PlayerSprite" index="0"]
+sprite_frames = SubResource("SpriteFrames_nrdyo")
 
 [node name="PlayerLane2" type="Control" parent="GameContainer/PlayerLanes" index="1"]
 custom_minimum_size = Vector2(0, 60)
@@ -175,13 +245,9 @@ text = "P2"
 position = Vector2(50, 30)
 metadata/initial_y = 30
 
-[node name="ColorRect" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane2/PlayerSprite" index="0"]
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-color = Color(0.2, 0.4, 1, 1)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="GameContainer/PlayerLanes/PlayerLane2/PlayerSprite" index="0"]
+sprite_frames = SubResource("SpriteFrames_qjobc")
 
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
-stream = ExtResource("3_c1ur1")
+stream = ExtResource("5_a4idd")
 bus = &"Minigames BGM"

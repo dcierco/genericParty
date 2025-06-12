@@ -27,6 +27,7 @@ window/size/viewport_height=720
 window/size/mode=3
 window/size/window_width_override=1280
 window/size/window_height_override=720
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 window/stretch/scale_mode="integer"
 #3correspondstofullscreenwindow/stretch/mode="canvas_items"
@@ -136,3 +137,4 @@ p2_right={
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+2d/stretch/mode="viewport"

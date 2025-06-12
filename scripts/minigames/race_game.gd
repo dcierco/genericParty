@@ -142,6 +142,8 @@ func process_playing(delta):
 			# Update progress bar
 			update_player_progress(player_id)
 			
+			player_sprites[player_id].get_child(0).play("default")
+			
 			# Add a bounce effect as feedback when button is pressed
 			if player_sprites.has(player_id) and is_instance_valid(player_sprites[player_id]):
 				var initial_y = player_sprites[player_id].get_meta("initial_y")

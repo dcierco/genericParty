@@ -2,18 +2,41 @@ extends "res://scripts/minigames/minigame_base.gd"
 
 # Player settings
 const PLAYER_SPEED = 300.0
-const JUMP_VELOCITY = -700.0 
-const PLAYER_GRAVITY_SCALE = 1.2
-const PUSH_POWER = 4000.0
+const JUMP_VELOCITY = -500.0        # Reduced for lower jump
+const JUMP_GRAVITY_SCALE_UP = 1.0   # Normal gravity when moving up
+const JUMP_GRAVITY_SCALE_DOWN = 2.5 # Much heavier gravity when falling
+const PUSH_POWER = 1000.0
+
 const PUSH_RANGE = 60.0
 
-# Platform settings
-const PLATFORM_WIDTH_MIN = 80
-const PLATFORM_WIDTH_MAX = 200
+# Jump physics calculations
+# Max height: velocity² / (2 * gravity * scale_up) = 500² / (2 * 980 * 1.0) ≈ 127 pixels
+# Time to peak: velocity / (gravity * scale_up) = 500 / (980 * 1.0) ≈ 0.51 seconds  
+# Total jump time: 2 * time_to_peak ≈ 1.02 seconds
+# Max horizontal distance: horizontal_speed * total_time = 300 * 1.02 ≈ 306 pixels
+
+const PLATFORM_WIDTH_MIN = 60
+const PLATFORM_WIDTH_MAX = 160
 const PLATFORM_HEIGHT = 20
-const PLATFORM_VERTICAL_SPACING_MIN = 80
-const PLATFORM_VERTICAL_SPACING_MAX = 120
-const PLATFORM_HORIZONTAL_SPREAD = 600
+const PLATFORM_VERTICAL_SPACING_SAFE = 80      # Easy to reach with margin
+const PLATFORM_VERTICAL_SPACING_RISKY = 110    # Reachable but requires good timing
+const PLATFORM_VERTICAL_SPACING_TRAP = 150     # Unreachable - trap spacing
+const PLATFORM_HORIZONTAL_SPREAD = 800
+
+# Jump reachability constants (calculated from physics)
+const MAX_JUMP_HEIGHT = 127                    # Maximum vertical reach
+const MAX_HORIZONTAL_DISTANCE = 306            # Maximum horizontal reach during jump
+const SAFE_HORIZONTAL_DISTANCE = 250          # Safe horizontal distance with margin
+
+# Platform spawn patterns
+enum PlatformPattern {
+	ZIGZAG_DUAL,    # Two zigzag paths that cross each other
+	FUNNEL_IN,      # Paths start wide, converge to center
+	FUNNEL_OUT,     # Paths start center, spread out wideAdd commentMore actions
+	ALTERNATING,    # Single path that alternates left-right
+	CROSSING_PATHS, # Paths that intersect and create push opportunities
+	RECOVERY_AREA   # Help players who fell behind
+}
 
 # Camera and map progression settings
 const CAMERA_FOLLOW_SPEED = 2.0
@@ -28,6 +51,11 @@ var map_height_meters = 0.0
 var player_heights = {}
 var player_detailed_scores = {}
 var eliminated_players = {}
+
+# Dynamic platform generation
+var current_pattern = PlatformPattern.ZIGZAG_DUAL
+var pattern_platforms_left = 0
+var platform_generation_height = 0
 
 # Node references
 @onready var camera = $GameContainer/Camera2D
@@ -97,19 +125,19 @@ func setup_players():
 	if is_instance_valid(player1):
 		player1.position = $GameContainer/PlayerSpawnPositions/P1Spawn.position
 		player1.visible = true
-		player1.set_meta("speed", PLAYER_SPEED)
-		player1.set_meta("jump_velocity", JUMP_VELOCITY)
-		player1.set_meta("player_gravity_scale", PLAYER_GRAVITY_SCALE)
-		player1.set_meta("eliminated", false)
+		player1.speed = PLAYER_SPEED
+		player1.jump_velocity = JUMP_VELOCITY
+		player1.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player1.eliminated = false
 	
 	# Setup player 2
 	if is_instance_valid(player2):
 		player2.position = $GameContainer/PlayerSpawnPositions/P2Spawn.position
 		player2.visible = player_count > 1
-		player2.set_meta("speed", PLAYER_SPEED)
-		player2.set_meta("jump_velocity", JUMP_VELOCITY)
-		player2.set_meta("player_gravity_scale", PLAYER_GRAVITY_SCALE)
-		player2.set_meta("eliminated", false)
+		player2.speed = PLAYER_SPEED
+		player2.jump_velocity = JUMP_VELOCITY
+		player2.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player2.eliminated = false
 	
 	# Initialize player scores
 	for i in range(player_count):
@@ -123,21 +151,20 @@ func setup_camera():
 		camera.limit_bottom = 800  # Set bottom limit so players can't fall infinitely
 
 func create_initial_platforms():
-	# Create a few platforms above the starting platform that are reachable
-	for i in range(10):
+	# Create fewer initial platforms
+	for i in range(5):
 		spawn_platform()
 	
 	# Create some easier starting platforms close to the ground
 	create_starting_platforms()
 
 func create_starting_platforms():
-	# Create some guaranteed reachable platforms near the starting position
+	# Create fewer guaranteed reachable platforms near the starting position
 	var start_positions = [
 		Vector2(400, 650),   # Left platform
 		Vector2(640, 600),   # Center platform (a bit higher)
 		Vector2(880, 650),   # Right platform
-		Vector2(520, 550),   # Mid-left higher
-		Vector2(760, 550)    # Mid-right higher
+		Vector2(640, 580)    # Center platform higher up
 	]
 	
 	for pos in start_positions:
@@ -156,7 +183,7 @@ func create_starting_platforms():
 		var visual = ColorRect.new()
 		visual.size = Vector2(120, PLATFORM_HEIGHT)
 		visual.position = Vector2(-60, -PLATFORM_HEIGHT/2)
-		visual.color = Color(0.4, 0.3, 0.2)
+		visual.color = Color(0.4, 0.3, 0.2)  # Standard brown
 		platform.add_child(visual)
 		
 		platform.position = pos
@@ -173,6 +200,9 @@ func _physics_process(delta):
 	if current_state != MinigameState.PLAYING:
 		return
 	
+	# Check push
+	check_push()
+	
 	# Update highest player position
 	update_highest_player_position()
 	
@@ -186,10 +216,17 @@ func _physics_process(delta):
 	update_height_displays()
 	update_debug_display()
 
+func check_push():
+	if Input.is_action_just_pressed("p1_action"):
+		push_other_players(player1, 0)
+		
+	if Input.is_action_just_pressed("p2_action"):
+		push_other_players(player2, 1)
+
 func push_other_players(pusher: CharacterBody2D, pusher_id: int):
 	var other_player = player2 if pusher_id == 0 else player1
 	
-	if is_instance_valid(other_player) and not other_player.get_meta("eliminated") and other_player.visible:
+	if is_instance_valid(other_player) and not other_player.eliminated and other_player.visible:
 		var distance = pusher.global_position.distance_to(other_player.global_position)
 		
 		if distance < PUSH_RANGE:
@@ -203,11 +240,11 @@ func update_highest_player_position():
 	var new_highest = highest_player_y
 	
 	# Check player 1
-	if is_instance_valid(player1) and not player1.get_meta("eliminated") and player1.visible:
+	if is_instance_valid(player1) and not player1.eliminated and player1.visible:
 		new_highest = min(new_highest, player1.position.y)
 	
 	# Check player 2
-	if is_instance_valid(player2) and not player2.get_meta("eliminated") and player2.visible:
+	if is_instance_valid(player2) and not player2.eliminated and player2.visible:
 		new_highest = min(new_highest, player2.position.y)
 	
 	highest_player_y = new_highest
@@ -233,12 +270,12 @@ func check_player_eliminations():
 	var elimination_y = current_camera_y + ELIMINATION_DISTANCE
 	
 	# Check player 1
-	if is_instance_valid(player1) and not player1.get_meta("eliminated") and player1.visible:
+	if is_instance_valid(player1) and not player1.eliminated and player1.visible:
 		if player1.position.y > elimination_y:
 			eliminate_player(0)
 	
 	# Check player 2
-	if is_instance_valid(player2) and not player2.get_meta("eliminated") and player2.visible:
+	if is_instance_valid(player2) and not player2.eliminated and player2.visible:
 		if player2.position.y > elimination_y:
 			eliminate_player(1)
 
@@ -335,43 +372,237 @@ func _on_platform_spawn_timer_timeout():
 		spawn_platform()
 
 func spawn_platform():
+	# Check if we need a new pattern
+	if pattern_platforms_left <= 0:
+		choose_next_pattern()
+	
+	# Generate platforms based on current pattern
+	match current_pattern:
+		PlatformPattern.ZIGZAG_DUAL:
+			spawn_zigzag_dual()
+		PlatformPattern.FUNNEL_IN:
+			spawn_funnel_in()
+		PlatformPattern.FUNNEL_OUT:
+			spawn_funnel_out()
+		PlatformPattern.ALTERNATING:
+			spawn_alternating()
+		PlatformPattern.CROSSING_PATHS:
+			spawn_crossing_paths()
+		PlatformPattern.RECOVERY_AREA:
+			spawn_recovery_area_platforms()
+	
+	pattern_platforms_left -= 1
+	cleanup_old_platforms()
+
+func choose_next_pattern():
+	# Competitive pattern selection based on screen position and height
+	var height_factor = platform_generation_height / 3000.0  
+	var rand_value = randf()
+	
+	# Always use dynamic patterns that force movement
+	if rand_value < 0.25:
+		current_pattern = PlatformPattern.ZIGZAG_DUAL
+		pattern_platforms_left = randi_range(3, 5)  # More platforms for zigzag
+	elif rand_value < 0.4:
+		current_pattern = PlatformPattern.FUNNEL_IN
+		pattern_platforms_left = randi_range(2, 3)
+	elif rand_value < 0.55:
+		current_pattern = PlatformPattern.FUNNEL_OUT
+		pattern_platforms_left = randi_range(2, 3)
+	elif rand_value < 0.75:
+		current_pattern = PlatformPattern.ALTERNATING
+		pattern_platforms_left = randi_range(3, 4)
+	elif rand_value < 0.9:
+		current_pattern = PlatformPattern.CROSSING_PATHS
+		pattern_platforms_left = randi_range(2, 3)
+	else:
+		current_pattern = PlatformPattern.RECOVERY_AREA
+		pattern_platforms_left = 1
+
+func spawn_zigzag_dual():
+	# Two paths that zigzag back and forth, creating dynamic movement
+	var base_y = platform_spawn_y - PLATFORM_VERTICAL_SPACING_SAFE
+	
+	# Determine current step in zigzag pattern
+	var step = (platform_generation_height / PLATFORM_VERTICAL_SPACING_SAFE) % 4
+	
+	match step:
+		0:  # Start moderate spread
+			create_platform_at(Vector2(400, base_y), Color(0.4, 0.3, 0.2))
+			create_platform_at(Vector2(800, base_y), Color(0.4, 0.3, 0.2))
+		1:  # Move inward
+			create_platform_at(Vector2(500, base_y), Color(0.4, 0.3, 0.2))
+			create_platform_at(Vector2(700, base_y), Color(0.4, 0.3, 0.2))
+		2:  # Center convergence
+			create_platform_at(Vector2(570, base_y), Color(0.4, 0.3, 0.2))
+			create_platform_at(Vector2(630, base_y), Color(0.4, 0.3, 0.2))
+		3:  # Back out moderate
+			create_platform_at(Vector2(450, base_y), Color(0.4, 0.3, 0.2))
+			create_platform_at(Vector2(750, base_y), Color(0.4, 0.3, 0.2))
+	
+	platform_spawn_y = base_y
+	platform_generation_height += PLATFORM_VERTICAL_SPACING_SAFE
+
+func spawn_funnel_in():
+	# Paths start wide and funnel toward center
+	var base_y = platform_spawn_y - PLATFORM_VERTICAL_SPACING_SAFE
+	var step = pattern_platforms_left
+	
+	if step > 1:  # Starting moderately wide
+		create_platform_at(Vector2(350 + randf_range(-30, 30), base_y), Color(0.4, 0.3, 0.2))
+		create_platform_at(Vector2(850 + randf_range(-30, 30), base_y), Color(0.4, 0.3, 0.2))
+	else:  # Funnel to center
+		create_platform_at(Vector2(600 + randf_range(-60, 60), base_y), Color(0.4, 0.3, 0.2), 120)  # Wider center platform
+	
+	platform_spawn_y = base_y
+	platform_generation_height += PLATFORM_VERTICAL_SPACING_SAFE
+
+func spawn_funnel_out():
+	# Paths start center and spread outward
+	var base_y = platform_spawn_y - PLATFORM_VERTICAL_SPACING_SAFE
+	var step = pattern_platforms_left
+	
+	if step > 1:  # Starting narrow
+		create_platform_at(Vector2(580 + randf_range(-30, 30), base_y), Color(0.4, 0.3, 0.2))
+		create_platform_at(Vector2(620 + randf_range(-30, 30), base_y), Color(0.4, 0.3, 0.2))
+	else:  # Spread out moderately
+		create_platform_at(Vector2(400 + randf_range(-40, 40), base_y), Color(0.4, 0.3, 0.2))
+		create_platform_at(Vector2(800 + randf_range(-40, 40), base_y), Color(0.4, 0.3, 0.2))
+	
+	platform_spawn_y = base_y
+	platform_generation_height += PLATFORM_VERTICAL_SPACING_SAFE
+
+func spawn_alternating():
+	# Single path that forces left-right movement
+	var base_y = platform_spawn_y - PLATFORM_VERTICAL_SPACING_SAFE
+	var step = (platform_generation_height / PLATFORM_VERTICAL_SPACING_SAFE) % 3
+	
+	var x_pos = 0
+	match step:
+		0:  x_pos = 450  # Left-center
+		1:  x_pos = 600  # Center
+		2:  x_pos = 750  # Right-center
+	
+	# Add some randomness but keep within reachable bounds
+	x_pos += randf_range(-50, 50)
+	create_platform_at(Vector2(x_pos, base_y), Color(0.4, 0.3, 0.2), 100)
+	
+	platform_spawn_y = base_y
+	platform_generation_height += PLATFORM_VERTICAL_SPACING_SAFE
+
+func spawn_crossing_paths():
+	# Two paths that cross each other, creating push opportunities
+	var base_y = platform_spawn_y - PLATFORM_VERTICAL_SPACING_SAFE
+	var step = pattern_platforms_left
+	
+	if step > 1:  # First level - moderately separated
+		create_platform_at(Vector2(400, base_y), Color(0.4, 0.3, 0.2))
+		create_platform_at(Vector2(800, base_y), Color(0.4, 0.3, 0.2))
+	else:  # Crossing point - close together for push interactions
+		create_platform_at(Vector2(560, base_y), Color(0.4, 0.3, 0.2), 80)
+		create_platform_at(Vector2(640, base_y), Color(0.4, 0.3, 0.2), 80)
+	
+	platform_spawn_y = base_y
+	platform_generation_height += PLATFORM_VERTICAL_SPACING_SAFE
+
+func spawn_recovery_area_platforms():
+	# Multiple wider platforms to help players catch up
+	var base_y = platform_spawn_y - PLATFORM_VERTICAL_SPACING_SAFE + 30  # Closer spacing for recovery
+	
+	create_platform_at(Vector2(350, base_y), Color(0.4, 0.3, 0.2), 140)  # Wide platform
+	create_platform_at(Vector2(640, base_y + 15), Color(0.4, 0.3, 0.2), 140)  # Wide platform
+	create_platform_at(Vector2(850, base_y), Color(0.4, 0.3, 0.2), 140)  # Wide platform
+	
+	platform_spawn_y = base_y
+	platform_generation_height += PLATFORM_VERTICAL_SPACING_SAFE
+
+func is_platform_reachable(from_pos: Vector2, to_pos: Vector2) -> bool:
+	# Calculate if a platform is reachable with current jump physics
+	var horizontal_distance = abs(to_pos.x - from_pos.x)
+	var vertical_distance = from_pos.y - to_pos.y  # Positive when jumping up
+	
+	# Check if horizontal distance is achievable
+	if horizontal_distance > MAX_HORIZONTAL_DISTANCE:
+		return false
+	
+	# Check if we can reach the height
+	if vertical_distance > MAX_JUMP_HEIGHT:
+		return false
+	
+	# Check if falling too far (can always fall)
+	if vertical_distance < -200:  # Allow reasonable falling distance
+		return false
+	
+	return true
+
+func get_last_platform_positions() -> Array:
+	# Get positions of recently created platforms for reachability checking
+	var positions = []
+	var platform_count = platform_container.get_child_count()
+	var check_count = min(5, platform_count)  # Check last 5 platforms
+	
+	for i in range(check_count):
+		var platform = platform_container.get_child(platform_count - 1 - i)
+		positions.append(platform.position)
+	
+	return positions
+
+func create_platform_at(pos: Vector2, color: Color, width: float = -1):
+	# Validate reachability from recent platforms
+	var recent_positions = get_last_platform_positions()
+	var is_reachable = false
+	
+	for recent_pos in recent_positions:
+		if is_platform_reachable(recent_pos, pos):
+			is_reachable = true
+			break
+	
+	# If not reachable, adjust position to make it reachable
+	if not is_reachable and recent_positions.size() > 0:
+		var closest_pos = recent_positions[0]
+		var adjusted_pos = adjust_position_for_reachability(closest_pos, pos)
+		pos = adjusted_pos
+		
 	var platform = StaticBody2D.new()
 	platform.name = "Platform_" + str(platform_container.get_child_count())
-	
-	# Set collision layers
 	platform.collision_layer = 1  # World layer
 	platform.collision_mask = 0
 	
-	# Create collision shape
 	var collision = CollisionShape2D.new()
 	var shape = RectangleShape2D.new()
-	
-	# Random platform width
-	var platform_width = randf_range(PLATFORM_WIDTH_MIN, PLATFORM_WIDTH_MAX)
+	var platform_width = width if width > 0 else randf_range(PLATFORM_WIDTH_MIN, PLATFORM_WIDTH_MAX)
 	shape.size = Vector2(platform_width, PLATFORM_HEIGHT)
 	collision.shape = shape
-	
-	# Enable one-way collision (players can jump up through platforms)
 	collision.one_way_collision = true
-	
 	platform.add_child(collision)
 	
 	# Create visual
 	var visual = ColorRect.new()
 	visual.size = Vector2(platform_width, PLATFORM_HEIGHT)
 	visual.position = Vector2(-platform_width/2, -PLATFORM_HEIGHT/2)
-	visual.color = Color(0.4, 0.3, 0.2)  # Brown platform color
+	visual.color = color
 	platform.add_child(visual)
 	
-	# Position platform
-	var x_pos = randf_range(100, 1180)  # Random X within screen bounds with some padding
-	var y_spacing = randf_range(PLATFORM_VERTICAL_SPACING_MIN, PLATFORM_VERTICAL_SPACING_MAX)
-	platform_spawn_y -= y_spacing
-	
-	platform.position = Vector2(x_pos, platform_spawn_y)
-	
-	# Add to container
+	platform.position = pos
 	platform_container.add_child(platform)
+
+func adjust_position_for_reachability(from_pos: Vector2, target_pos: Vector2) -> Vector2:
+	# Adjust target position to be reachable from from_pos
+	var horizontal_distance = target_pos.x - from_pos.x
+	var vertical_distance = from_pos.y - target_pos.y
+	
+	# Limit horizontal distance
+	if abs(horizontal_distance) > SAFE_HORIZONTAL_DISTANCE:
+		var sign = 1 if horizontal_distance > 0 else -1
+		horizontal_distance = SAFE_HORIZONTAL_DISTANCE * sign	
+	
+		# Limit vertical distance  
+	if vertical_distance > PLATFORM_VERTICAL_SPACING_RISKY:
+		vertical_distance = PLATFORM_VERTICAL_SPACING_RISKY
+	elif vertical_distance < -100:  # Don't fall too far
+		vertical_distance = -100
+
+	return Vector2(from_pos.x + horizontal_distance, from_pos.y - vertical_distance)
 	
 	# Clean up platforms that are too far below camera
 	cleanup_old_platforms()

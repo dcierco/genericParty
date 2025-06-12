@@ -2,9 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://c0la3uwclwi4" path="res://scripts/minigames/avoid_the_obstacles.gd" id="2_script"]
-[ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://players/player1.tscn" id="3_britd"]
+[ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_britd"]
 [ext_resource type="AudioStream" uid="uid://dhbs1s6q7f1aj" path="res://sfx/28 - Tension.ogg" id="3_vh6eq"]
-[ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://players/player2.tscn" id="4_vfxmd"]
+[ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_vfxmd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
 bg_color = Color(1, 0.2, 0.2, 1)

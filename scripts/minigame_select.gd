@@ -109,7 +109,7 @@ func _on_minigame_completed(_results):
 	
 	# Start background music
 	AudioServer.set_bus_volume_linear(2, 0)
-	AudioServer.set_bus_volume_linear(1, 0.6)
+	AudioServer.set_bus_volume_linear(1, 0.5)
 	$BackgroundMusic.play()
 	
 	# Update description to show last result

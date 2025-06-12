@@ -3,8 +3,10 @@ extends "res://scripts/minigames/minigame_base.gd"
 # Player settings
 const PLAYER_SPEED = 300.0
 const JUMP_VELOCITY = -700.0 
-const PLAYER_GRAVITY_SCALE = 1.2
+const JUMP_GRAVITY_SCALE_UP = 1.2
 const PUSH_POWER = 2000.0
+
+const PUSH_RANGE = 60.0
 
 # Obstacle settings
 const OBSTACLE_FALL_SPEED_MIN = 150.0
@@ -91,19 +93,19 @@ func setup_players():
 	if is_instance_valid(player1):
 		player1.position = $GameContainer/PlayerSpawnPositions/P1Spawn.position
 		player1.visible = true
-		player1.set_meta("speed", PLAYER_SPEED)
-		player1.set_meta("jump_velocity", JUMP_VELOCITY)
-		player1.set_meta("player_gravity_scale", PLAYER_GRAVITY_SCALE)
-		player1.set_meta("eliminated", false)
+		player1.speed = PLAYER_SPEED
+		player1.jump_velocity = JUMP_VELOCITY
+		player1.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player1.eliminated = false
 	
 	# Setup player 2
 	if is_instance_valid(player2):
 		player2.position = $GameContainer/PlayerSpawnPositions/P2Spawn.position
 		player2.visible = player_count > 1
-		player2.set_meta("speed", PLAYER_SPEED)
-		player2.set_meta("jump_velocity", JUMP_VELOCITY)
-		player2.set_meta("player_gravity_scale", PLAYER_GRAVITY_SCALE)
-		player2.set_meta("eliminated", false)
+		player2.speed = PLAYER_SPEED
+		player2.jump_velocity = JUMP_VELOCITY
+		player2.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player2.eliminated = false
 	
 	# Initialize player scores
 	for i in range(player_count):
@@ -122,6 +124,9 @@ func _physics_process(delta):
 	if current_state != MinigameState.PLAYING:
 		return
 	
+	# Check push
+	check_push()
+	
 	# Check for collisions with obstacles
 	check_obstacle_collisions(player1, 0)
 	check_obstacle_collisions(player2, 1)
@@ -129,13 +134,20 @@ func _physics_process(delta):
 	# Update sine wave obstacles
 	update_sine_obstacles(delta)
 
+func check_push():
+	if Input.is_action_just_pressed("p1_action"):
+		push_other_players(player1, 0)
+		
+	if Input.is_action_just_pressed("p2_action"):
+		push_other_players(player2, 1)
+
 func push_other_players(pusher: CharacterBody2D, pusher_id: int):
 	var other_player = player2 if pusher_id == 0 else player1
 	
-	if is_instance_valid(other_player) and not other_player.get_meta("eliminated") and other_player.visible:
+	if is_instance_valid(other_player) and not other_player.eliminated and other_player.visible:
 		var distance = pusher.global_position.distance_to(other_player.global_position)
 		
-		if distance < 50:  # Push range
+		if distance < PUSH_RANGE:  # Push range
 			var push_direction = (other_player.global_position - pusher.global_position).normalized()
 			
 			# Apply push directly to the other player's position and velocity
@@ -143,7 +155,7 @@ func push_other_players(pusher: CharacterBody2D, pusher_id: int):
 			other_player.velocity += push_direction * PUSH_POWER
 
 func check_obstacle_collisions(player: CharacterBody2D, player_id: int):
-	if not is_instance_valid(player) or player.get_meta("eliminated") or not player.visible:
+	if not is_instance_valid(player) or player.eliminated or not player.visible:
 		return
 		
 	# Check for collisions with obstacles
@@ -166,7 +178,7 @@ func process_playing(delta):
 	# Update survival times and bars for active players
 	for player_id in [0, 1]:
 		var player = player1 if player_id == 0 else player2
-		if is_instance_valid(player) and player.visible and not player.get_meta("eliminated"):
+		if is_instance_valid(player) and player.visible and not player.eliminated:
 			active_player_count += 1
 			player_survival_times[player_id] += delta
 			player_scores[player_id] = int(player_survival_times[player_id] * 10)
@@ -240,7 +252,7 @@ func spawn_obstacle():
 	
 	if random_value < 0.4:  # 40% chance for side obstacle
 		obstacle_type = 1
-	elif random_value < 0.25:  # 5% chance for sine wave obstacle
+	elif random_value < 0.5:  # 50% chance for sine wave obstacle
 		obstacle_type = 2
 	
 	# Setup physics
@@ -254,8 +266,13 @@ func spawn_obstacle():
 	obstacle.set_meta("type", obstacle_type)
 	if obstacle_type == 2:  # Sine wave
 		obstacle.set_meta("sine_time", 0.0)
-		obstacle.set_meta("sine_amplitude", randf_range(50, 100))
-		obstacle.set_meta("sine_frequency", randf_range(2, 4))
+		obstacle.set_meta("sine_amplitude", randf_range(30, 100))  # How much it moves up/downAdd commentMore actions
+		obstacle.set_meta("sine_frequency", randf_range(1.5, 5.0))  # How fast it oscillates
+		# Some obstacles have no slope (straight), others have slope
+		var slope = 0.0
+		if randf() > 0.3:  # 70% chance to have slope
+			slope = randf_range(-0.3, 0.3)
+		obstacle.set_meta("sine_slope", slope)  # Vertical slope while moving horizontally
 	
 	# Create collision shape
 	var collision = CollisionShape2D.new()
@@ -327,16 +344,19 @@ func spawn_obstacle():
 			obstacle.global_position = Vector2(1330, y_pos)
 			obstacle.linear_velocity = Vector2(randf_range(-300, -200), 0)  # Move left
 	else:  # Sine wave
-		# Similar to side obstacle but will move in sine pattern
+		# Spawn at same height as side obstacles
 		var from_left = randf() > 0.5
-		var y_pos = randf_range(200, 500)  # Somewhere in the middle of the screen
+		var y_pos = ground_node.global_position.y - 15  # Same as side obstacles
+		
+		# Store initial center position for sine wave calculations
+		obstacle.set_meta("initial_y", y_pos)
 		
 		if from_left:
 			obstacle.global_position = Vector2(-50, y_pos)
-			obstacle.linear_velocity = Vector2(randf_range(150, 250), 0)  # Move right
+			obstacle.linear_velocity = Vector2(randf_range(120, 280), 0)  # Varying horizontal speed
 		else:
 			obstacle.global_position = Vector2(1330, y_pos)
-			obstacle.linear_velocity = Vector2(randf_range(-250, -150), 0)  # Move left
+			obstacle.linear_velocity = Vector2(randf_range(-280, -120), 0)  # Varying horizontal speed
 	
 	# Add auto-cleanup when obstacle exits screen
 	var visibility_notifier = VisibleOnScreenNotifier2D.new()
@@ -390,11 +410,11 @@ func end_game_if_someone_eliminated():
 	var active_player_id = -1
 	
 	# Check which players are still active
-	if is_instance_valid(player1) and not player1.get_meta("eliminated") and player1.visible:
+	if is_instance_valid(player1) and not player1.eliminated and player1.visible:
 		active_players.append(player1)
 		active_player_id = 0
 		
-	if is_instance_valid(player2) and not player2.get_meta("eliminated") and player2.visible:
+	if is_instance_valid(player2) and not player2.eliminated and player2.visible:
 		active_players.append(player2)
 		active_player_id = 1
 	
@@ -438,14 +458,22 @@ func update_sine_obstacles(delta):
 			
 			var amplitude = obstacle.get_meta("sine_amplitude")
 			var frequency = obstacle.get_meta("sine_frequency")
+			var slope = obstacle.get_meta("sine_slope")
+			var initial_y = obstacle.get_meta("initial_y")
 			
-			# Calculate vertical offset based on sine wave
-			var vertical_offset = sin(sine_time * frequency) * amplitude
+			# Calculate sine wave position
+			var sine_offset = sin(sine_time * frequency) * amplitude
 			
-			# Apply vertical offset while maintaining horizontal velocity
+			# Add slope component (gradual rise/fall over time)
+			var slope_offset = slope * sine_time * 20  # Scale slope effect
+			
+			# Set position relative to initial center positionAdd commentMore actions
+			var target_y = initial_y + sine_offset + slope_offset
+			obstacle.position.y = target_y
+			
+			# Maintain horizontal velocity only
 			var current_velocity = obstacle.linear_velocity
-			obstacle.position.y = obstacle.position.y + vertical_offset * delta
-			obstacle.linear_velocity = Vector2(current_velocity.x, 0)  # Maintain horizontal velocity only
+			obstacle.linear_velocity = Vector2(current_velocity.x, 0)
 
 func end_minigame():
 	if current_state == MinigameState.FINISHED or current_state == MinigameState.RESULTS:
@@ -546,16 +574,16 @@ func display_results():
 				var score_data = player_detailed_scores[player_id]
 				
 				# Survival time
-				var time_label = Label.new()
+				var survival_time_label = Label.new()
 				var seconds = int(score_data.survival_time)
 				var milliseconds = int((score_data.survival_time - seconds) * 100)
-				time_label.text = "Survived: " + str(seconds) + "." + str(milliseconds).pad_zeros(2) + " seconds"
-				player_results.add_child(time_label)
+				survival_time_label.text = "Survived: " + str(seconds) + "." + str(milliseconds).pad_zeros(2) + " seconds"
+				player_results.add_child(survival_time_label)
 				
 				# Survival score
-				var survival_label = Label.new()
-				survival_label.text = "+ " + str(score_data.survival_score) + " points (time survived)"
-				player_results.add_child(survival_label)
+				var survival_score_label = Label.new()
+				survival_score_label.text = "+ " + str(score_data.survival_score) + " points (time survived)"
+				player_results.add_child(survival_score_label)
 				
 				# Win bonus if applicable
 				if score_data.win_bonus > 0:

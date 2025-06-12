@@ -8,7 +8,8 @@ extends CharacterBody2D
 @export var speed = 350.0
 @export var jump_velocity = -650.0 
 @export var gravity := 980.0
-@export var player_gravity_scale = 2.0
+@export var jump_gravity_scale_up = 1.0
+@export var jump_gravity_scale_down = 2.5
 
 # If the player can push other players
 @export var can_push_other_players: bool = true
@@ -45,10 +46,10 @@ var player_input_map = {
 
 func _ready():
 	setup_visuals()
-	if can_push_other_players:
-		set_collision_mask_value(2, true)
-	else:
-		set_collision_mask_value(2, false)
+	# if can_push_other_players:
+	#	set_collision_mask_value(2, true)
+	#else:
+	#	set_collision_mask_value(2, false)
 	
 func setup_visuals():
 
@@ -142,7 +143,7 @@ func _physics_process(delta):
 			move_side(delta)
 		MovementType.TOP_DOWN_8_WAY:
 			move_8way(delta)
-			
+
 	# Atualiza a animação e move o personagem
 	animate()
 	move_and_slide()
@@ -153,7 +154,10 @@ func move_side(delta):
 		return
 	
 	velocity.x = 0
-	velocity.y += player_gravity_scale * gravity * delta
+	
+	if not is_on_floor():
+		var gravity_scale = jump_gravity_scale_up if velocity.y < 0 else jump_gravity_scale_down
+		velocity.y += gravity * gravity_scale * delta
 	
 	var vel := Input.get_axis(inputs.left, inputs.right)
 	var jump := Input.is_action_just_pressed(inputs.up)
@@ -173,12 +177,14 @@ func move_8way(delta):
 	var input_direction = Input.get_vector(inputs.left, inputs.right, inputs.up, inputs.down)
 	velocity = input_direction * speed
 	
-	var collision_info = move_and_collide(velocity * delta)
-	if collision_info:
-		velocity = velocity.bounce(collision_info.get_normal())
-		move_and_collide(velocity * delta * 10)
+	# var collision_info = move_and_collide(velocity * delta)
+	# if collision_info:
+	#	velocity = velocity.bounce(collision_info.get_normal())
+	#	move_and_collide(velocity * delta * 10)
 
 func animate():
+	var _inputs = player_input_map.get(player_id)
+	
 	if velocity.x > 0:
 		sprite.play("right")
 	elif velocity.x < 0:

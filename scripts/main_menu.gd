@@ -20,7 +20,7 @@ func _ready():
 	# turn_count_spinner.value = 1
 	
 	# Start background music
-	AudioServer.set_bus_volume_linear(1, 0.6)
+	AudioServer.set_bus_volume_linear(1, 0.5)
 	$BackgroundMusic.play()
 
 # Remove board game start function
