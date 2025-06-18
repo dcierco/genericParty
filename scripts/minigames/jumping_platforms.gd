@@ -1,6 +1,7 @@
 extends "res://scripts/minigames/minigame_base.gd"
 
 # Player settings
+const PLAYER_SPEED = 300.0
 const PLAYER_HORIZONTAL_SPEED = 300.0
 const JUMP_VELOCITY = -500.0        # Reduced for lower jump
 const JUMP_GRAVITY_SCALE_UP = 1.0   # Normal gravity when moving up
