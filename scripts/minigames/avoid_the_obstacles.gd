@@ -252,7 +252,11 @@ func spawn_obstacle():
 	
 	if random_value < 0.4:  # 40% chance for side obstacle
 		obstacle_type = 1
+<<<<<<< HEAD
 	elif random_value < 0.5:  # 50% chance for sine wave obstacle
+=======
+	elif random_value < 0.5:  # 5% chance for sine wave obstacle
+>>>>>>> origin/main
 		obstacle_type = 2
 	
 	# Setup physics
@@ -266,7 +270,11 @@ func spawn_obstacle():
 	obstacle.set_meta("type", obstacle_type)
 	if obstacle_type == 2:  # Sine wave
 		obstacle.set_meta("sine_time", 0.0)
+<<<<<<< HEAD
 		obstacle.set_meta("sine_amplitude", randf_range(30, 100))  # How much it moves up/downAdd commentMore actions
+=======
+		obstacle.set_meta("sine_amplitude", randf_range(30, 100))  # How much it moves up/down
+>>>>>>> origin/main
 		obstacle.set_meta("sine_frequency", randf_range(1.5, 5.0))  # How fast it oscillates
 		# Some obstacles have no slope (straight), others have slope
 		var slope = 0.0
@@ -467,7 +475,11 @@ func update_sine_obstacles(delta):
 			# Add slope component (gradual rise/fall over time)
 			var slope_offset = slope * sine_time * 20  # Scale slope effect
 			
+<<<<<<< HEAD
 			# Set position relative to initial center positionAdd commentMore actions
+=======
+			# Set position relative to initial center position
+>>>>>>> origin/main
 			var target_y = initial_y + sine_offset + slope_offset
 			obstacle.position.y = target_y
 			
