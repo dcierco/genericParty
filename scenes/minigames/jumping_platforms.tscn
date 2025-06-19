@@ -1,14 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://843pyc871ejq"]
+[gd_scene load_steps=7 format=3 uid="uid://843pyc871ejq"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://d3m8lal6p2n1" path="res://scripts/minigames/jumping_platforms.gd" id="2_script"]
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
-radius = 15.0
-height = 50.0
+[ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_7ts5n"]
+[ext_resource type="AudioStream" uid="uid://ca63miah030k5" path="res://sfx/34  - Fight.ogg" id="3_uum82"]
+[ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_bf7lg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
-size = Vector2(1280, 60)
+size = Vector2(1280, 40)
 
 [node name="JumpingPlatforms" instance=ExtResource("1_base")]
 script = ExtResource("2_script")
@@ -73,48 +72,23 @@ editor_description = "Platforms will be added as children to this node"
 editor_description = "Starting positions for players"
 
 [node name="P1Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPositions" index="0"]
-position = Vector2(540, 700)
+position = Vector2(540, 720)
 
 [node name="P2Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPositions" index="1"]
-position = Vector2(740, 700)
+position = Vector2(740, 720)
 
 [node name="Players" type="Node2D" parent="GameContainer" index="5"]
 
-[node name="Player1" type="CharacterBody2D" parent="GameContainer/Players" index="0"]
-position = Vector2(540, 700)
-collision_layer = 2
-collision_mask = 3
+[node name="Player1" parent="GameContainer/Players" index="0" instance=ExtResource("3_7ts5n")]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player1" index="0"]
-shape = SubResource("CapsuleShape2D_player")
-
-[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player1" index="1"]
-offset_left = -15.0
-offset_top = -25.0
-offset_right = 15.0
-offset_bottom = 25.0
-color = Color(1, 0.2, 0.2, 1)
-
-[node name="Player2" type="CharacterBody2D" parent="GameContainer/Players" index="1"]
-position = Vector2(740, 700)
-collision_layer = 2
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player2" index="0"]
-shape = SubResource("CapsuleShape2D_player")
-
-[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player2" index="1"]
-offset_left = -15.0
-offset_top = -25.0
-offset_right = 15.0
-offset_bottom = 25.0
-color = Color(0.2, 0.4, 1, 1)
+[node name="Player2" parent="GameContainer/Players" index="1" instance=ExtResource("4_bf7lg")]
 
 [node name="GroundPlatform" type="StaticBody2D" parent="GameContainer" index="6"]
 position = Vector2(640, 750)
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/GroundPlatform" index="0"]
+position = Vector2(0, 10)
 shape = SubResource("RectangleShape2D_platform")
 
 [node name="ColorRect" type="ColorRect" parent="GameContainer/GroundPlatform" index="1"]
@@ -133,3 +107,7 @@ theme_override_font_sizes/font_size = 12
 text = "Camera Y: 0
 Platforms: 0
 Highest Player: 0"
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
+stream = ExtResource("3_uum82")
+bus = &"Minigames BGM"

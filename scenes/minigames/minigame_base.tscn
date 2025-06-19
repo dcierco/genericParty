@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dhf74egj0b4jv"]
+[gd_scene load_steps=5 format=3 uid="uid://dhf74egj0b4jv"]
 
 [ext_resource type="Script" uid="uid://bt424k7nox0n3" path="res://scripts/minigames/minigame_base.gd" id="1_hwv1k"]
+[ext_resource type="AudioStream" uid="uid://b75fekj2xrwpa" path="res://sfx/LevelUp1.wav" id="2_eelwh"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_redteam"]
 bg_color = Color(1, 0.2, 0.2, 0.2)
@@ -132,3 +133,7 @@ vertical_alignment = 1
 
 [node name="ResultsList" type="VBoxContainer" parent="UI/ResultsContainer/VBoxContainer"]
 layout_mode = 2
+
+[node name="EndMinigameSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_eelwh")
+bus = &"SFX"

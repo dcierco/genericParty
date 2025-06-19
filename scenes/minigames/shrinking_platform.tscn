@@ -1,10 +1,10 @@
-[gd_scene load_steps=4 format=3 uid="uid://ff5qdnmufywm"]
+[gd_scene load_steps=6 format=3 uid="uid://ff5qdnmufywm"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_5dvjb"]
 [ext_resource type="Script" uid="uid://c174wihqcqh31" path="res://scripts/minigames/shrinking_platform.gd" id="2_1bghx"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
-radius = 15.0
+[ext_resource type="AudioStream" uid="uid://bmcardpuw8qny" path="res://sfx/24 - Final Area.ogg" id="3_6u6yj"]
+[ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_go7ha"]
+[ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_0m74l"]
 
 [node name="ShrinkingPlatform" instance=ExtResource("1_5dvjb")]
 script = ExtResource("2_1bghx")
@@ -47,35 +47,11 @@ position = Vector2(700, 320)
 
 [node name="Players" type="Node2D" parent="GameContainer" index="2"]
 
-[node name="Player1" type="CharacterBody2D" parent="GameContainer/Players" index="0"]
-position = Vector2(580, 320)
-collision_layer = 2
-collision_mask = 3
+[node name="Player1" parent="GameContainer/Players" index="0" instance=ExtResource("3_go7ha")]
+movement_type = 1
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player1" index="0"]
-shape = SubResource("CircleShape2D_player")
-
-[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player1" index="1"]
-offset_left = -15.0
-offset_top = -15.0
-offset_right = 15.0
-offset_bottom = 15.0
-color = Color(1, 0.2, 0.2, 1)
-
-[node name="Player2" type="CharacterBody2D" parent="GameContainer/Players" index="1"]
-position = Vector2(700, 320)
-collision_layer = 2
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player2" index="0"]
-shape = SubResource("CircleShape2D_player")
-
-[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player2" index="1"]
-offset_left = -15.0
-offset_top = -15.0
-offset_right = 15.0
-offset_bottom = 15.0
-color = Color(0.2, 0.4, 1, 1)
+[node name="Player2" parent="GameContainer/Players" index="1" instance=ExtResource("4_0m74l")]
+movement_type = 1
 
 [node name="DebugInfo" type="Label" parent="GameContainer" index="3"]
 offset_left = 10.0
@@ -86,3 +62,7 @@ theme_override_font_sizes/font_size = 12
 text = "Platform Cells: 0
 Lava Cells: 0
 Spiral Position: (0,0)"
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
+stream = ExtResource("3_6u6yj")
+bus = &"Minigames BGM"
