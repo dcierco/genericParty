@@ -1,10 +1,12 @@
 extends "res://scripts/minigames/minigame_base.gd"
 
 # Player settings
-const PLAYER_HORIZONTAL_SPEED = 350.0
-const JUMP_VELOCITY = -650.0 
-const PLAYER_GRAVITY_SCALE = 2.0
+const PLAYER_SPEED = 300.0
+const JUMP_VELOCITY = -700.0 
+const JUMP_GRAVITY_SCALE_UP = 1.2
 const PUSH_POWER = 2000.0
+
+const PUSH_RANGE = 60.0
 
 # Obstacle settings
 const OBSTACLE_FALL_SPEED_MIN = 150.0
@@ -34,24 +36,6 @@ var player_detailed_scores = {}
 var eliminated_players = {}
 var obstacle_count = 0
 
-# Player input mapping
-var player_input_map = {
-	0: {
-		"left": "p1_left", 
-		"right": "p1_right", 
-		"jump": "p1_up",
-		"push": "p1_action",
-		"team": "red"
-	},
-	1: {
-		"left": "p2_left", 
-		"right": "p2_right", 
-		"jump": "p2_up",
-		"push": "p2_action",
-		"team": "blue"
-	}
-}
-
 func _ready():
 	minigame_id = "avoid_the_obstacles"
 	minigame_name = "Avoid the Obstacles!"
@@ -61,6 +45,8 @@ func _ready():
 	has_time_limit = true
 
 	super._ready()
+	
+	$BackgroundMusic.play()
 
 	if description_label:
 		description_label.text = minigame_description
@@ -107,21 +93,19 @@ func setup_players():
 	if is_instance_valid(player1):
 		player1.position = $GameContainer/PlayerSpawnPositions/P1Spawn.position
 		player1.visible = true
-		player1.set_meta("player_id", 0)
-		player1.set_meta("eliminated", false)
-		
-		# Update player_teams in the base class for consistency
-		player_teams[0] = player_input_map[0].get("team", "red")
+		player1.speed = PLAYER_SPEED
+		player1.jump_velocity = JUMP_VELOCITY
+		player1.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player1.eliminated = false
 	
 	# Setup player 2
 	if is_instance_valid(player2):
 		player2.position = $GameContainer/PlayerSpawnPositions/P2Spawn.position
 		player2.visible = player_count > 1
-		player2.set_meta("player_id", 1)
-		player2.set_meta("eliminated", false)
-		
-		# Update player_teams in the base class for consistency
-		player_teams[1] = player_input_map[1].get("team", "blue")
+		player2.speed = PLAYER_SPEED
+		player2.jump_velocity = JUMP_VELOCITY
+		player2.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player2.eliminated = false
 	
 	# Initialize player scores
 	for i in range(player_count):
@@ -139,10 +123,9 @@ func start_gameplay():
 func _physics_process(delta):
 	if current_state != MinigameState.PLAYING:
 		return
-		
-	# Handle player movement
-	process_player_movement(player1, 0, delta)
-	process_player_movement(player2, 1, delta)
+	
+	# Check push
+	check_push()
 	
 	# Check for collisions with obstacles
 	check_obstacle_collisions(player1, 0)
@@ -151,52 +134,20 @@ func _physics_process(delta):
 	# Update sine wave obstacles
 	update_sine_obstacles(delta)
 
-func process_player_movement(player: CharacterBody2D, player_id: int, delta: float):
-	if not is_instance_valid(player) or player.get_meta("eliminated") or not player.visible:
-		return
+func check_push():
+	if Input.is_action_just_pressed("p1_action"):
+		push_other_players(player1, 0)
 		
-	var inputs = player_input_map.get(player_id)
-	if not inputs:
-		return
-	
-	var velocity = player_velocities.get(player_id, Vector2.ZERO)
-	
-	# Apply gravity
-	var gravity = ProjectSettings.get_setting("physics/2d/default_gravity", 980)
-	if not player.is_on_floor():
-		velocity.y += gravity * PLAYER_GRAVITY_SCALE * delta
-	
-	# Horizontal movement
-	var direction = 0
-	if Input.is_action_pressed(inputs.left):
-		direction -= 1
-	if Input.is_action_pressed(inputs.right):
-		direction += 1
-	
-	velocity.x = direction * PLAYER_HORIZONTAL_SPEED
-	
-	# Jump
-	if Input.is_action_just_pressed(inputs.jump) and player.is_on_floor():
-		velocity.y = JUMP_VELOCITY
-	
-	# Push action
-	if Input.is_action_just_pressed(inputs.push):
-		push_other_players(player, player_id)
-	
-	# Apply movement
-	player.velocity = velocity
-	player.move_and_slide()
-	
-	# Store updated velocity
-	player_velocities[player_id] = player.velocity
+	if Input.is_action_just_pressed("p2_action"):
+		push_other_players(player2, 1)
 
 func push_other_players(pusher: CharacterBody2D, pusher_id: int):
 	var other_player = player2 if pusher_id == 0 else player1
 	
-	if is_instance_valid(other_player) and not other_player.get_meta("eliminated") and other_player.visible:
+	if is_instance_valid(other_player) and not other_player.eliminated and other_player.visible:
 		var distance = pusher.global_position.distance_to(other_player.global_position)
 		
-		if distance < 50:  # Push range
+		if distance < PUSH_RANGE:  # Push range
 			var push_direction = (other_player.global_position - pusher.global_position).normalized()
 			
 			# Apply push directly to the other player's position and velocity
@@ -204,7 +155,7 @@ func push_other_players(pusher: CharacterBody2D, pusher_id: int):
 			other_player.velocity += push_direction * PUSH_POWER
 
 func check_obstacle_collisions(player: CharacterBody2D, player_id: int):
-	if not is_instance_valid(player) or player.get_meta("eliminated") or not player.visible:
+	if not is_instance_valid(player) or player.eliminated or not player.visible:
 		return
 		
 	# Check for collisions with obstacles
@@ -227,7 +178,7 @@ func process_playing(delta):
 	# Update survival times and bars for active players
 	for player_id in [0, 1]:
 		var player = player1 if player_id == 0 else player2
-		if is_instance_valid(player) and player.visible and not player.get_meta("eliminated"):
+		if is_instance_valid(player) and player.visible and not player.eliminated:
 			active_player_count += 1
 			player_survival_times[player_id] += delta
 			player_scores[player_id] = int(player_survival_times[player_id] * 10)
@@ -301,7 +252,8 @@ func spawn_obstacle():
 	
 	if random_value < 0.4:  # 40% chance for side obstacle
 		obstacle_type = 1
-	elif random_value < 0.5:  # 5% chance for sine wave obstacle
+
+	elif random_value < 0.5:  # 50% chance for sine wave obstacle
 		obstacle_type = 2
 	
 	# Setup physics
@@ -426,7 +378,7 @@ func eliminate_player(player_id):
 		return
 	
 	print("Player " + str(player_id + 1) + " eliminated!")
-	player.set_meta("eliminated", true)
+	player.eliminate()
 	player.visible = false
 	
 	# Disable collision so eliminated player doesn't interfere
@@ -459,11 +411,11 @@ func end_game_if_someone_eliminated():
 	var active_player_id = -1
 	
 	# Check which players are still active
-	if is_instance_valid(player1) and not player1.get_meta("eliminated") and player1.visible:
+	if is_instance_valid(player1) and not player1.eliminated and player1.visible:
 		active_players.append(player1)
 		active_player_id = 0
 		
-	if is_instance_valid(player2) and not player2.get_meta("eliminated") and player2.visible:
+	if is_instance_valid(player2) and not player2.eliminated and player2.visible:
 		active_players.append(player2)
 		active_player_id = 1
 	
@@ -516,6 +468,7 @@ func update_sine_obstacles(delta):
 			# Add slope component (gradual rise/fall over time)
 			var slope_offset = slope * sine_time * 20  # Scale slope effect
 			
+
 			# Set position relative to initial center position
 			var target_y = initial_y + sine_offset + slope_offset
 			obstacle.position.y = target_y
@@ -623,16 +576,16 @@ func display_results():
 				var score_data = player_detailed_scores[player_id]
 				
 				# Survival time
-				var time_label = Label.new()
+				var survival_time_label = Label.new()
 				var seconds = int(score_data.survival_time)
 				var milliseconds = int((score_data.survival_time - seconds) * 100)
-				time_label.text = "Survived: " + str(seconds) + "." + str(milliseconds).pad_zeros(2) + " seconds"
-				player_results.add_child(time_label)
+				survival_time_label.text = "Survived: " + str(seconds) + "." + str(milliseconds).pad_zeros(2) + " seconds"
+				player_results.add_child(survival_time_label)
 				
 				# Survival score
-				var survival_label = Label.new()
-				survival_label.text = "+ " + str(score_data.survival_score) + " points (time survived)"
-				player_results.add_child(survival_label)
+				var survival_score_label = Label.new()
+				survival_score_label.text = "+ " + str(score_data.survival_score) + " points (time survived)"
+				player_results.add_child(survival_score_label)
 				
 				# Win bonus if applicable
 				if score_data.win_bonus > 0:

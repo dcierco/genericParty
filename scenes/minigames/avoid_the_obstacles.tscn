@@ -1,7 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://c5j3f7k2l8g1"]
+[gd_scene load_steps=9 format=3 uid="uid://c5j3f7k2l8g1"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://c0la3uwclwi4" path="res://scripts/minigames/avoid_the_obstacles.gd" id="2_script"]
+[ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_britd"]
+[ext_resource type="AudioStream" uid="uid://dhbs1s6q7f1aj" path="res://sfx/28 - Tension.ogg" id="3_vh6eq"]
+[ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_vfxmd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
 bg_color = Color(1, 0.2, 0.2, 1)
@@ -19,10 +22,6 @@ corner_radius_bottom_left = 3
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
 size = Vector2(1280, 50)
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
-radius = 15.0
-height = 50.0
 
 [node name="AvoidTheObstacles" instance=ExtResource("1_base")]
 script = ExtResource("2_script")
@@ -176,35 +175,12 @@ position = Vector2(900, 550)
 
 [node name="Players" type="Node2D" parent="GameContainer" index="6"]
 
-[node name="Player1" type="CharacterBody2D" parent="GameContainer/Players" index="0"]
+[node name="Player1" parent="GameContainer/Players" index="0" instance=ExtResource("3_britd")]
 position = Vector2(300, 550)
 collision_layer = 2
 collision_mask = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player1" index="0"]
-shape = SubResource("CapsuleShape2D_player")
-
-[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player1" index="1"]
-offset_left = -15.0
-offset_top = -25.0
-offset_right = 15.0
-offset_bottom = 25.0
-color = Color(1, 0.2, 0.2, 1)
-
-[node name="Player2" type="CharacterBody2D" parent="GameContainer/Players" index="1"]
-position = Vector2(900, 550)
-collision_layer = 2
-collision_mask = 3
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Players/Player2" index="0"]
-shape = SubResource("CapsuleShape2D_player")
-
-[node name="ColorRect" type="ColorRect" parent="GameContainer/Players/Player2" index="1"]
-offset_left = -15.0
-offset_top = -25.0
-offset_right = 15.0
-offset_bottom = 25.0
-color = Color(0.2, 0.4, 1, 1)
+[node name="Player2" parent="GameContainer/Players" index="1" instance=ExtResource("4_vfxmd")]
 
 [node name="ObstacleContainer" type="Node2D" parent="GameContainer" index="7"]
 editor_description = "Obstacles will be added as children to this node by the script"
@@ -218,3 +194,7 @@ theme_override_font_sizes/font_size = 12
 text = "Active Obstacles: 0
 Difficulty: 0%
 Spawn Rate: 0s"
+
+[node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
+stream = ExtResource("3_vh6eq")
+bus = &"Minigames BGM"

@@ -2,19 +2,41 @@ extends "res://scripts/minigames/minigame_base.gd"
 
 # Race settings
 var track_length: float = 1000.0 # Length for the track 
-var progress_per_press: float = 15.0 # Progress per button press
+var progress_per_press: float = 20.0 # Progress per correct button press
+var penalty_per_wrong: float = 5.0 # Penalty for wrong button press
 
 # Player state
 var player_progress: Dictionary = {} # player_id: current progress
 var player_sprites: Dictionary = {}  # player_id: sprite node
 var player_detailed_scores: Dictionary = {} # Detailed score breakdown for each player
+var player_current_buttons: Dictionary = {} # player_id: current required button
+var player_button_timers: Dictionary = {} # player_id: time left to press button
+var button_display_time: float = 2.0 # Time to press the correct button
 
-# Player state uses team colors from minigame_base.gd
+# Available buttons for each player
+var available_buttons: Dictionary = {
+	0: ["p1_left", "p1_right", "p1_up", "p1_down", "p1_action"],  # A, D, W, S, Space
+	1: ["p2_left", "p2_right", "p2_up", "p2_down", "p2_action"]   # Left, Right, Up, Down, Enter
+}
 
-# Input mapping
+# Button display names
+var button_names: Dictionary = {
+	"p1_left": "A",
+	"p1_right": "D", 
+	"p1_up": "W",
+	"p1_down": "S",
+	"p1_action": "SPACE",
+	"p2_left": "←",
+	"p2_right": "→",
+	"p2_up": "↑",
+	"p2_down": "↓",
+	"p2_action": "ENTER"
+}
+
+# Input mapping (keeping for compatibility)
 var player_inputs: Dictionary = {
-	0: {"action": "p1_action", "team": "red"},
-	1: {"action": "p2_action", "team": "blue"},
+	0: {"team": "red"},
+	1: {"team": "blue"},
 }
 
 # UI node references - using @onready to get them when scene is ready
@@ -24,19 +46,23 @@ var player_inputs: Dictionary = {
 @onready var player_lane2 = $GameContainer/PlayerLanes/PlayerLane2
 @onready var progress_bar_p1 = $UI/ProgressContainer/Player1ProgressVBox/ProgressBarP1
 @onready var progress_bar_p2 = $UI/ProgressContainer/Player2ProgressVBox/ProgressBarP2
+# Button prompt labels will be created dynamically
+var button_prompt_labels: Dictionary = {}
 
 func _ready():
 	print("Race Game: Ready")
 	# Set minigame properties
 	minigame_id = "race_game"
-	minigame_name = "Button Mash Race"
-	minigame_description = "Mash your action button to reach the finish line first!\nPlayer 1: Space\nPlayer 2: Enter"
+	minigame_name = "Race Game"
+	minigame_description = "Press the correct button shown on screen to advance!\nPlayer 1: A/D/W/S/Space\nPlayer 2: Arrow Keys/Enter"
 	
-	# Set time limit to 10 seconds
-	minigame_duration = 10.0
-	time_remaining = 10.0
+	# Set time limit to 25 seconds
+	minigame_duration = 25.0
+	time_remaining = 25.0
 	
 	super._ready()
+	
+	$BackgroundMusic.play()
 	
 	# Update description label if needed
 	if description_label:
@@ -69,6 +95,8 @@ func setup_players():
 		player_progress[i] = 0.0
 		player_scores[i] = 0
 		player_finished[i] = false
+		player_current_buttons[i] = ""
+		player_button_timers[i] = 0.0
 		
 		# Reset player sprite positions
 		if player_sprites.has(i) and is_instance_valid(player_sprites[i]):
@@ -100,6 +128,15 @@ func start_gameplay():
 		if is_instance_valid(player_sprites[i]):
 			player_sprites[i].position.x = 50
 			player_sprites[i].visible = true
+	
+	# Create button prompt labels
+	create_button_prompt_labels()
+	
+	# Generate first button prompts for all players
+	var player_count = MinigameManager.get_player_count()
+	player_count = min(player_count, 2)
+	for i in range(player_count):
+		generate_new_button_prompt(i)
 
 func _process(delta):
 	match current_state:
@@ -131,21 +168,43 @@ func process_playing(delta):
 		
 		all_finished = false # At least one player is still playing
 		
-		# Handle input
-		var action_name = player_inputs[player_id]["action"]
-		if Input.is_action_just_pressed(action_name):
-			player_progress[player_id] = min(player_progress[player_id] + progress_per_press, track_length)
-			print("Player " + str(player_id) + " pressed action. Progress: " + str(player_progress[player_id]))
+		# Update button timer
+		player_button_timers[player_id] -= delta
+		
+		# Check if button timer expired
+		if player_button_timers[player_id] <= 0:
+			# Time's up! Generate new button prompt
+			generate_new_button_prompt(player_id)
+		
+		# Handle input for all available buttons
+		var pressed_button = get_pressed_button(player_id)
+		if pressed_button != "":
+			if pressed_button == player_current_buttons[player_id]:
+				# Correct button pressed!
+				player_progress[player_id] = min(player_progress[player_id] + progress_per_press, track_length)
+				print("Player " + str(player_id) + " pressed correct button. Progress: " + str(player_progress[player_id]))
+				
+				# Update progress bar
+				update_player_progress(player_id)
+				
+				# Visual feedback for correct press
+				show_feedback(player_id, true)
+				
+				# Generate new button prompt
+				generate_new_button_prompt(player_id)
+			else:
+				# Wrong button pressed!
+				player_progress[player_id] = max(player_progress[player_id] - penalty_per_wrong, 0)
+				print("Player " + str(player_id) + " pressed wrong button. Progress: " + str(player_progress[player_id]))
+				
+				# Update progress bar
+				update_player_progress(player_id)
+				
+				# Visual feedback for wrong press
+				show_feedback(player_id, false)
 			
-			# Update progress bar
-			update_player_progress(player_id)
-			
-			# Add a bounce effect as feedback when button is pressed
-			if player_sprites.has(player_id) and is_instance_valid(player_sprites[player_id]):
-				var initial_y = player_sprites[player_id].get_meta("initial_y")
-				var tween = create_tween()
-				tween.tween_property(player_sprites[player_id], "position:y", initial_y - 5, 0.1)
-				tween.tween_property(player_sprites[player_id], "position:y", initial_y, 0.1)
+			# Update button prompt display
+			update_button_prompt_display(player_id)
 		
 		# Check if player reached finish line
 		if player_progress[player_id] >= track_length and not player_finished.get(player_id, false):
@@ -192,16 +251,20 @@ func finish_player(player_id: int):
 	# Base score is percentage of distance traveled (max 100 points)
 	var distance_score = int((player_progress[player_id] / track_length) * 100)
 	
-	# Win bonus for finishing first (100 points)
-	var win_bonus = 100 if rank == 1 else 0
+	# First place bonus (50 points)
+	var first_place_bonus = 50 if rank == 1 else 0
+	
+	# Completion bonus for finishing the race (200 points - very hard to achieve)
+	var completion_bonus = 200 if player_progress[player_id] >= track_length else 0
 	
 	# Total score
-	var score = distance_score + win_bonus
+	var score = distance_score + first_place_bonus + completion_bonus
 	
 	# Store detailed score breakdown for results display
 	player_detailed_scores[player_id] = {
 		"distance": distance_score,
-		"win_bonus": win_bonus,
+		"first_place_bonus": first_place_bonus,
+		"completion_bonus": completion_bonus,
 		"total": score
 	}
 	
@@ -211,7 +274,7 @@ func finish_player(player_id: int):
 	# Get player's team from base class
 	var team = player_teams.get(player_id, "red")
 	print("Player " + str(player_id) + " (Team " + team + ") finished in rank " + str(rank))
-	print("Score breakdown: Distance " + str(distance_score) + ", Win bonus: " + str(win_bonus) + ", Total: " + str(score))
+	print("Score breakdown: Distance " + str(distance_score) + ", First place: " + str(first_place_bonus) + ", Completion: " + str(completion_bonus) + ", Total: " + str(score))
 	
 	# Add visual indicator for finish rank
 	if player_sprites.has(player_id) and is_instance_valid(player_sprites[player_id]):
@@ -234,12 +297,25 @@ func process_finished(delta):
 	# Call superclass logic
 	super.process_finished(delta)
 
+func cleanup_button_prompt_labels():
+	# Remove button prompt labels from the scene
+	for player_id in button_prompt_labels:
+		var label = button_prompt_labels[player_id]
+		if is_instance_valid(label):
+			label.queue_free()
+	button_prompt_labels.clear()
+
 func _exit_tree():
 	print("Race Game: Cleaning up")
+	# Clean up button prompts
+	cleanup_button_prompt_labels()
+	
 	# Clear dictionaries
 	player_progress.clear()
 	player_sprites.clear()
 	player_inputs.clear()
+	player_current_buttons.clear()
+	player_button_timers.clear()
 
 func end_minigame():
 	print("Race Game: Game over")
@@ -248,6 +324,9 @@ func end_minigame():
 	if current_state == MinigameState.FINISHED or current_state == MinigameState.RESULTS:
 		print("Race Game: Already finished, ignoring duplicate end_minigame call")
 		return
+	
+	# Clean up button prompt labels
+	cleanup_button_prompt_labels()
 	
 	# Complete any unfinished players with their current progress
 	var player_count = MinigameManager.get_player_count()
@@ -261,7 +340,8 @@ func end_minigame():
 			# Store detailed score breakdown
 			player_detailed_scores[player_id] = {
 				"distance": distance_score,
-				"win_bonus": 0, # No win bonus for not finishing
+				"first_place_bonus": 0, # No first place bonus for not finishing
+				"completion_bonus": 0, # No completion bonus for not finishing
 				"total": distance_score
 			}
 			
@@ -363,12 +443,19 @@ func display_results():
 				distance_label.text = "+ " + str(score_data.distance) + " points (distance traveled: " + str(distance_percent) + "%)"
 				player_results.add_child(distance_label)
 				
-				# Win bonus if applicable
-				if score_data.win_bonus > 0:
-					var bonus_label = Label.new()
-					bonus_label.text = "+ " + str(score_data.win_bonus) + " points (win bonus)"
-					bonus_label.add_theme_color_override("font_color", Color(1, 0.8, 0))
-					player_results.add_child(bonus_label)
+				# First place bonus if applicable
+				if score_data.get("first_place_bonus", 0) > 0:
+					var first_place_label = Label.new()
+					first_place_label.text = "+ " + str(score_data.first_place_bonus) + " points (first place bonus)"
+					first_place_label.add_theme_color_override("font_color", Color(1, 0.8, 0))
+					player_results.add_child(first_place_label)
+				
+				# Completion bonus if applicable
+				if score_data.get("completion_bonus", 0) > 0:
+					var completion_label = Label.new()
+					completion_label.text = "+ " + str(score_data.completion_bonus) + " points (completion bonus)"
+					completion_label.add_theme_color_override("font_color", Color(0, 1, 0))
+					player_results.add_child(completion_label)
 				
 				# Total
 				var total_label = Label.new()
@@ -396,3 +483,80 @@ func display_results():
 		# Then back to normal
 		tween.tween_property(red_team_panel, "modulate", Color(1, 1, 1, 1), 0.5)
 		tween.parallel().tween_property(blue_team_panel, "modulate", Color(1, 1, 1, 1), 0.5)
+
+# New functions for reflex mechanics
+func create_button_prompt_labels():
+	# Create button prompt labels for each player
+	var player_count = MinigameManager.get_player_count()
+	player_count = min(player_count, 2)
+	
+	for i in range(player_count):
+		var label = Label.new()
+		label.add_theme_font_size_override("font_size", 72)
+		label.add_theme_color_override("font_color", team_colors[player_teams[i]])
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		
+		# Position labels horizontally: Player 1 on left, Player 2 on right
+		if i == 0:
+			# Player 1 (red team) on left side
+			label.position = Vector2(50, 50)
+		else:
+			# Player 2 (blue team) on right side  
+			label.position = Vector2(1000, 50)
+		
+		label.size = Vector2(200, 100)
+		get_parent().add_child(label)  # Add to main scene instead of player lanes
+		button_prompt_labels[i] = label
+
+func generate_new_button_prompt(player_id: int):
+	# Generate a random button for the player to press
+	var buttons = available_buttons[player_id]
+	var random_button = buttons[randi() % buttons.size()]
+	player_current_buttons[player_id] = random_button
+	player_button_timers[player_id] = button_display_time
+	
+	update_button_prompt_display(player_id)
+	
+	print("Player " + str(player_id) + " must press: " + button_names[random_button])
+
+func update_button_prompt_display(player_id: int):
+	if button_prompt_labels.has(player_id):
+		var label = button_prompt_labels[player_id]
+		var button_name = button_names[player_current_buttons[player_id]]
+		
+		label.text = button_name
+		
+		# Keep consistent team color
+		label.add_theme_color_override("font_color", team_colors[player_teams[player_id]])
+
+func get_pressed_button(player_id: int) -> String:
+	# Check which button was pressed by this player
+	var buttons = available_buttons[player_id]
+	for button in buttons:
+		if Input.is_action_just_pressed(button):
+			return button
+	return ""
+
+func show_feedback(player_id: int, correct: bool):
+	# Visual feedback when button is pressed
+	if player_sprites.has(player_id) and is_instance_valid(player_sprites[player_id]):
+		var sprite = player_sprites[player_id]
+		var initial_y = sprite.get_meta("initial_y")
+		
+		if correct:
+			# Green flash and bounce for correct
+			sprite.get_child(0).play("default")
+			var tween = create_tween()
+			tween.tween_property(sprite, "modulate", Color.GREEN, 0.1)
+			tween.parallel().tween_property(sprite, "position:y", initial_y - 10, 0.1)
+			tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+			tween.parallel().tween_property(sprite, "position:y", initial_y, 0.1)
+		else:
+			# Red flash and shake for incorrect
+			var tween = create_tween()
+			tween.tween_property(sprite, "modulate", Color.RED, 0.1)
+			tween.parallel().tween_property(sprite, "position:x", sprite.position.x - 5, 0.05)
+			tween.parallel().tween_property(sprite, "position:x", sprite.position.x + 5, 0.05)
+			tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+			tween.parallel().tween_property(sprite, "position:x", sprite.position.x, 0.1)

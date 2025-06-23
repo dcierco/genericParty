@@ -24,8 +24,8 @@ func register_all_minigames():
 	register_minigame(
 		"race_game", 
 		"res://scenes/minigames/race_game.tscn", 
-		"Button Mash Race", 
-		"Mash your action button to reach the finish line first!\nPlayer 1: Space\nPlayer 2: Enter"
+		"Race Game", 
+		"Press the correct button shown on screen to advance!\nPlayer 1: A/D/W/Space\nPlayer 2: Arrow Keys/Enter"
 	)
 	
 	# Register shrinking platform game
@@ -99,6 +99,13 @@ func start_minigame(minigame_id: String = ""):
 	if minigame_id.is_empty() or not available_minigames.has(minigame_id):
 		push_error("Invalid minigame ID: " + minigame_id)
 		return
+	
+	# Clean up any existing minigame instance
+	if minigame_instance:
+		if minigame_instance.has_signal("minigame_completed"):
+			minigame_instance.disconnect("minigame_completed", Callable(self, "_on_minigame_completed"))
+		minigame_instance.queue_free()
+		minigame_instance = null
 	
 	current_minigame = minigame_id
 	

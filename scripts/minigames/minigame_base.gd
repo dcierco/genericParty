@@ -57,6 +57,10 @@ func _ready():
 	if results_container:
 		results_container.visible = false
 		
+	# Initialize minigame bus
+	AudioServer.set_bus_volume_linear(1, 0)
+	AudioServer.set_bus_volume_linear(2, 0.8)
+		
 	initialize_minigame()
 	
 func _process(delta):
@@ -186,6 +190,8 @@ func end_minigame():
 		return
 		
 	current_state = MinigameState.FINISHED
+	AudioServer.set_bus_volume_linear(2, 0.3)
+	$EndMinigameSound.play()
 	
 	# Show results screen
 	if results_container:

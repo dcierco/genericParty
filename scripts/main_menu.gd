@@ -1,23 +1,23 @@
 extends Control
 
 # UI References
-# Remove board game setting references
-# @onready var player_count_spinner = $VBoxContainer/SettingsContainer/PlayerCountContainer/PlayerCountSpinner
-# @onready var turn_count_spinner = $VBoxContainer/SettingsContainer/TurnCountContainer/TurnCountSpinner
-# @onready var start_button = $VBoxContainer/StartButton
+@onready var play_button = $VBoxContainer/PlayButton
 @onready var quit_button = $VBoxContainer/QuitButton
 @onready var minigames_button = $VBoxContainer/MinigamesButton
 
 func _ready():
 	# Connect button signals
-	# Remove start button connection
-	# start_button.pressed.connect(_on_start_button_pressed)
+	play_button.pressed.connect(_on_play_button_pressed)
 	quit_button.pressed.connect(_on_quit_button_pressed)
 	minigames_button.pressed.connect(_on_minigames_button_pressed)
 	
 	# Remove setting default values
 	# player_count_spinner.value = 4
-	# turn_count_spinner.value = 10
+	# turn_count_spinner.value = 1
+	
+	# Start background music
+	AudioServer.set_bus_volume_linear(1, 0.5)
+	$BackgroundMusic.play()
 
 # Remove board game start function
 # func _on_start_button_pressed():
@@ -33,6 +33,12 @@ func _ready():
 # Quit game
 func _on_quit_button_pressed():
 	get_tree().quit()
+
+# Start party mode (play all games with global scoring)
+func _on_play_button_pressed():
+	# Initialize global party mode
+	GlobalScoreManager.start_party_mode()
+	get_tree().change_scene_to_file("res://scenes/minigame_select.tscn")
 
 # Open minigame selection menu
 func _on_minigames_button_pressed():
