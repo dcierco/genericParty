@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameManager="*res://scripts/globals/game_manager.gd"
 MinigameManager="*res://scripts/globals/minigame_manager.gd"
+GlobalScoreManager="*res://scripts/globals/global_score_manager.gd"
 
 [display]
 

@@ -47,6 +47,11 @@ text = "GENERIC PARTY"
 label_settings = SubResource("LabelSettings_6ck6c")
 horizontal_alignment = 1
 
+[node name="PlayButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Play"
+
 [node name="MinigamesButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40

@@ -1,20 +1,20 @@
 extends "res://scripts/minigames/minigame_base.gd"
 
 # Player settings
-const PLAYER_SPEED = 300.0
-const PLAYER_HORIZONTAL_SPEED = 300.0
-const JUMP_VELOCITY = -500.0        # Reduced for lower jump
-const JUMP_GRAVITY_SCALE_UP = 1.0   # Normal gravity when moving up
-const JUMP_GRAVITY_SCALE_DOWN = 2.5 # Much heavier gravity when falling
+const PLAYER_SPEED = 200.0
+const PLAYER_HORIZONTAL_SPEED = 200.0
+const JUMP_VELOCITY = -550.0        # Moderate jump velocity
+const JUMP_GRAVITY_SCALE_UP = 0.9   # Slightly lighter gravity when moving up
+const JUMP_GRAVITY_SCALE_DOWN = 1.4 # Moderately heavier gravity when falling
 const PUSH_POWER = 1000.0
 
 const PUSH_RANGE = 60.0
 
 # Jump physics calculations
-# Max height: velocity² / (2 * gravity * scale_up) = 500² / (2 * 980 * 1.0) ≈ 127 pixels
-# Time to peak: velocity / (gravity * scale_up) = 500 / (980 * 1.0) ≈ 0.51 seconds
-# Total jump time: 2 * time_to_peak ≈ 1.02 seconds
-# Max horizontal distance: horizontal_speed * total_time = 300 * 1.02 ≈ 306 pixels
+# Max height: velocity² / (2 * gravity * scale_up) = 550² / (2 * 980 * 0.9) ≈ 172 pixels
+# Time to peak: velocity / (gravity * scale_up) = 550 / (980 * 0.9) ≈ 0.62 seconds
+# Total jump time: time_to_peak + fall_time ≈ 1.1 seconds (asymmetric due to different fall gravity)
+# Max horizontal distance: horizontal_speed * total_time = 200 * 1.1 ≈ 220 pixels
 
 # Platform settings
 const PLATFORM_WIDTH_MIN = 60
@@ -26,9 +26,9 @@ const PLATFORM_VERTICAL_SPACING_TRAP = 150     # Unreachable - trap spacing
 const PLATFORM_HORIZONTAL_SPREAD = 800
 
 # Jump reachability constants (calculated from physics)
-const MAX_JUMP_HEIGHT = 127                    # Maximum vertical reach
-const MAX_HORIZONTAL_DISTANCE = 306            # Maximum horizontal reach during jump
-const SAFE_HORIZONTAL_DISTANCE = 250          # Safe horizontal distance with margin
+const MAX_JUMP_HEIGHT = 172                    # Maximum vertical reach
+const MAX_HORIZONTAL_DISTANCE = 220            # Maximum horizontal reach during jump
+const SAFE_HORIZONTAL_DISTANCE = 180          # Safe horizontal distance with margin
 
 # Platform spawn patterns
 enum PlatformPattern {
@@ -130,6 +130,7 @@ func setup_players():
 		player1.speed = PLAYER_SPEED
 		player1.jump_velocity = JUMP_VELOCITY
 		player1.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player1.jump_gravity_scale_down = JUMP_GRAVITY_SCALE_DOWN
 		player1.eliminated = false
 
 	# Setup player 2
@@ -139,6 +140,7 @@ func setup_players():
 		player2.speed = PLAYER_SPEED
 		player2.jump_velocity = JUMP_VELOCITY
 		player2.jump_gravity_scale_up = JUMP_GRAVITY_SCALE_UP
+		player2.jump_gravity_scale_down = JUMP_GRAVITY_SCALE_DOWN
 		player2.eliminated = false
 
 	# Initialize player scores
@@ -201,6 +203,9 @@ func _physics_process(delta):
 	if current_state != MinigameState.PLAYING:
 		return
 
+	# Handle player movement and input
+	handle_player_movement(delta)
+
 	# Check push
 	check_push()
 
@@ -217,18 +222,18 @@ func _physics_process(delta):
 	update_height_displays()
 	update_debug_display()
 
-func check_push():
-	if Input.is_action_just_pressed("p1_action"):
-		push_other_players(player1, 0)
+func handle_player_movement(delta):
+	# Handle Player 1 movement and height tracking
+	if is_instance_valid(player1) and not player1.eliminated and player1.visible:
+		handle_single_player_movement(player1, 0, delta)
+	
+	# Handle Player 2 movement and height tracking  
+	if is_instance_valid(player2) and not player2.eliminated and player2.visible:
+		handle_single_player_movement(player2, 1, delta)
 
-	if Input.is_action_just_pressed("p2_action"):
-		push_other_players(player2, 1)
-	var inputs = player_input_map.get(player_id)
-	if not inputs:
-		return
-
+func handle_single_player_movement(player: CharacterBody2D, player_id: int, delta):
 	var velocity = player.velocity
-
+	
 	# Apply variable gravity for better jump feel
 	var gravity = ProjectSettings.get_setting("physics/2d/default_gravity", 980)
 	if not player.is_on_floor():
@@ -237,20 +242,22 @@ func check_push():
 
 	# Horizontal movement
 	var direction = 0
-	if Input.is_action_pressed(inputs.left):
-		direction -= 1
-	if Input.is_action_pressed(inputs.right):
-		direction += 1
+	if player_id == 0:  # Player 1 controls
+		if Input.is_action_pressed("p1_left"):
+			direction -= 1
+		if Input.is_action_pressed("p1_right"):
+			direction += 1
+		if Input.is_action_just_pressed("p1_up") and player.is_on_floor():
+			velocity.y = JUMP_VELOCITY
+	else:  # Player 2 controls
+		if Input.is_action_pressed("p2_left"):
+			direction -= 1
+		if Input.is_action_pressed("p2_right"):
+			direction += 1
+		if Input.is_action_just_pressed("p2_up") and player.is_on_floor():
+			velocity.y = JUMP_VELOCITY
 
 	velocity.x = direction * PLAYER_HORIZONTAL_SPEED
-
-	# Jump
-	if Input.is_action_just_pressed(inputs.jump) and player.is_on_floor():
-		velocity.y = JUMP_VELOCITY
-
-	# Push action
-	if Input.is_action_just_pressed(inputs.push):
-		push_other_players(player, player_id)
 
 	# Apply movement
 	player.velocity = velocity
@@ -259,6 +266,13 @@ func check_push():
 	# Update player height score (now based on ground level at y=700)
 	var height_meters = (700 - player.position.y) / 50.0  # Convert pixels to "meters" from ground
 	player_heights[player_id] = max(player_heights[player_id], height_meters)
+
+func check_push():
+	if Input.is_action_just_pressed("p1_action"):
+		push_other_players(player1, 0)
+
+	if Input.is_action_just_pressed("p2_action"):
+		push_other_players(player2, 1)
 
 func push_other_players(pusher: CharacterBody2D, pusher_id: int):
 	var other_player = player2 if pusher_id == 0 else player1
@@ -338,8 +352,8 @@ func eliminate_player(player_id):
 	}
 
 	eliminated_players[player_id] = true
-	player_finished[player_id] = true
-	player_scores[player_id] = height_score
+	# Use base class function to properly register the score
+	set_player_finished(player_id, height_score)
 
 	# Update height display with final height
 	if player_id == 0 and height_label_p1:
@@ -366,17 +380,21 @@ func check_game_over():
 	# If only one player left, they win
 	if active_players == 1 and eliminated_players.size() > 0:
 		var height_score = int(player_heights.get(last_player, 0.0) * 10)
-		var win_bonus = 200  # Bonus for being last player standing
-		var total_score = height_score + win_bonus
+		var first_place_bonus = 50  # First place bonus
+		var survival_bonus = 100  # Bonus for surviving to the end
+		var total_score = height_score + first_place_bonus + survival_bonus
 
 		player_detailed_scores[last_player] = {
 			"height_score": height_score,
-			"win_bonus": win_bonus,
+			"first_place_bonus": first_place_bonus,
+			"survival_bonus": survival_bonus,
 			"total": total_score
 		}
 
-		player_scores[last_player] = total_score
-		print("Player " + str(last_player + 1) + " wins by elimination!")
+		# Use the base class function to properly set the winner's score
+		set_player_finished(last_player, total_score)
+		print("Player " + str(last_player + 1) + " wins by elimination! Score: " + str(total_score))
+		print("Debug - player_scores after win: ", player_scores)
 		end_minigame()
 	elif active_players == 0:
 		# All players eliminated
@@ -640,19 +658,6 @@ func adjust_position_for_reachability(from_pos: Vector2, target_pos: Vector2) ->
 
 	return Vector2(from_pos.x + horizontal_distance, from_pos.y - vertical_distance)
 
-	# Limit horizontal distance
-	if abs(horizontal_distance) > SAFE_HORIZONTAL_DISTANCE:
-		var sign = 1 if horizontal_distance > 0 else -1
-		horizontal_distance = SAFE_HORIZONTAL_DISTANCE * sign
-
-	# Limit vertical distance
-	if vertical_distance > PLATFORM_VERTICAL_SPACING_RISKY:
-		vertical_distance = PLATFORM_VERTICAL_SPACING_RISKY
-	elif vertical_distance < -100:  # Don't fall too far
-		vertical_distance = -100
-
-	return Vector2(from_pos.x + horizontal_distance, from_pos.y - vertical_distance)
-
 func cleanup_old_platforms():
 	var cleanup_threshold = current_camera_y + 1000
 
@@ -673,17 +678,18 @@ func end_minigame():
 
 	# Handle any players still active when time runs out
 	for player_id in [0, 1]:
-		if not player_finished.get(player_id, true):
+		if not player_finished.get(player_id, false):
 			var height_score = int(player_heights.get(player_id, 0.0) * 10)
 
 			player_detailed_scores[player_id] = {
 				"height_score": height_score,
-				"win_bonus": 0,
+				"first_place_bonus": 0,
+				"survival_bonus": 0,
 				"total": height_score
 			}
 
-			player_scores[player_id] = height_score
-			player_finished[player_id] = true
+			# Use base class function to properly register the score
+			set_player_finished(player_id, height_score)
 
 	super.end_minigame()
 
@@ -745,11 +751,19 @@ func display_results():
 				height_label.text = "+ " + str(score_data.height_score) + " points (reached " + str(int(height_meters)) + " meters)"
 				player_results.add_child(height_label)
 
-				if score_data.has("win_bonus") and score_data.win_bonus > 0:
-					var bonus_label = Label.new()
-					bonus_label.text = "+ " + str(score_data.win_bonus) + " points (victory bonus)"
-					bonus_label.add_theme_color_override("font_color", Color(1, 0.8, 0))
-					player_results.add_child(bonus_label)
+				# First place bonus if applicable
+				if score_data.get("first_place_bonus", 0) > 0:
+					var first_place_label = Label.new()
+					first_place_label.text = "+ " + str(score_data.first_place_bonus) + " points (first place bonus)"
+					first_place_label.add_theme_color_override("font_color", Color(1, 0.8, 0))
+					player_results.add_child(first_place_label)
+				
+				# Survival bonus if applicable
+				if score_data.get("survival_bonus", 0) > 0:
+					var survival_label = Label.new()
+					survival_label.text = "+ " + str(score_data.survival_bonus) + " points (survival bonus)"
+					survival_label.add_theme_color_override("font_color", Color(0, 1, 0))
+					player_results.add_child(survival_label)
 
 				var total_label = Label.new()
 				total_label.text = "Total: " + str(score_data.total) + " points"

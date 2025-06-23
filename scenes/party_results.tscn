@@ -1,0 +1,113 @@
+[gd_scene load_steps=3 format=3 uid="uid://bw8vyd4xqfh0g"]
+
+[ext_resource type="Script" uid="uid://dqm04mfnaj72t" path="res://scripts/party_results.gd" id="1_party"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_party"]
+font_size = 48
+outline_size = 3
+outline_color = Color(0.176471, 0.176471, 0.176471, 1)
+
+[node name="PartyResults" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_party")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.137255, 0.52549, 0.262745, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = 30.0
+offset_right = -50.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "PARTY RESULTS"
+label_settings = SubResource("LabelSettings_party")
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ResultsContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ResultsContent" type="VBoxContainer" parent="VBoxContainer/ResultsContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 15
+
+[node name="WinnerLabel" type="Label" parent="VBoxContainer/ResultsContainer/ResultsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "🏆 WINNER: Player X 🏆"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="VBoxContainer/ResultsContainer/ResultsContent"]
+layout_mode = 2
+
+[node name="FinalScoresLabel" type="Label" parent="VBoxContainer/ResultsContainer/ResultsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Final Scores:"
+horizontal_alignment = 1
+
+[node name="ScoresList" type="VBoxContainer" parent="VBoxContainer/ResultsContainer/ResultsContent"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="HSeparator3" type="HSeparator" parent="VBoxContainer/ResultsContainer/ResultsContent"]
+layout_mode = 2
+
+[node name="GameBreakdownLabel" type="Label" parent="VBoxContainer/ResultsContainer/ResultsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Game Results:"
+horizontal_alignment = 1
+
+[node name="GameResults" type="VBoxContainer" parent="VBoxContainer/ResultsContainer/ResultsContent"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="NewPartyButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "New Party"
+
+[node name="MainMenuButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Main Menu"
+
+[node name="ExitButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Exit Game"

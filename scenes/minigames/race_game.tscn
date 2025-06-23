@@ -97,12 +97,12 @@ position = Vector2(652, 348)
 script = ExtResource("2_3w2rc")
 
 [node name="TitleLabel" parent="UI/IntroContainer/VBoxContainer" index="0"]
-text = "Button Mash Race"
+text = "Race Game"
 
 [node name="DescriptionLabel" parent="UI/IntroContainer/VBoxContainer" index="2"]
-text = "Mash your action button to reach the finish line first!
-Player 1: Space
-Player 2: Enter"
+text = "Press the correct button shown on screen to advance!
+Player 1: A/D/W/Space
+Player 2: Arrow Keys/Enter"
 
 [node name="ProgressContainer" type="GridContainer" parent="UI" index="3"]
 anchors_preset = 7

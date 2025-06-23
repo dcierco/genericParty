@@ -46,6 +46,38 @@ horizontal_alignment = 1
 [node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
+[node name="GlobalScorePanel" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScoreContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/GlobalScorePanel"]
+layout_mode = 2
+theme_override_constants/separation = 50
+alignment = 1
+
+[node name="Player1Score" type="Label" parent="MarginContainer/VBoxContainer/GlobalScorePanel/ScoreContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 28
+text = "Player 1: 0 pts"
+horizontal_alignment = 1
+
+[node name="Player2Score" type="Label" parent="MarginContainer/VBoxContainer/GlobalScorePanel/ScoreContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.4, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "Player 2: 0 pts"
+horizontal_alignment = 1
+
+[node name="GameProgress" type="Label" parent="MarginContainer/VBoxContainer/GlobalScorePanel/ScoreContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 24
+text = "Games: 0/4"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+
 [node name="MinigameList" type="ItemList" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
