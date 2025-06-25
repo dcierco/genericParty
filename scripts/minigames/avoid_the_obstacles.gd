@@ -115,6 +115,10 @@ func setup_players():
 
 func start_gameplay():
 	super.start_gameplay()
+	
+	player1.movable = true
+	player2.movable = true
+	
 	print("AvoidTheObstacles: Gameplay Started")
 	
 	# Start spawning obstacles

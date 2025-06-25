@@ -4,6 +4,7 @@ extends CharacterBody2D
 @export var player_name: String = "Player 1"
 @export var player_color: Color = Color(1, 0, 0)  # Default red
 @export var eliminated = false
+@export var movable = false
 
 @export var speed = 350.0
 @export var jump_velocity = -650.0 
@@ -137,16 +138,15 @@ func print_position():
 	print(position)
 
 func _physics_process(delta):
-	# Escolhe qual lógica de movimento e física aplicar baseado na variável 'movement_type'
-	match movement_type:
-		MovementType.SIDE:
-			move_side(delta)
-		MovementType.TOP_DOWN_8_WAY:
-			move_8way(delta)
+	if movable:
+		match movement_type:
+			MovementType.SIDE:
+				move_side(delta)
+			MovementType.TOP_DOWN_8_WAY:
+				move_8way(delta)
 
-	# Atualiza a animação e move o personagem
-	animate()
-	move_and_slide()
+		animate()
+		move_and_slide()
 
 func move_side(delta):
 	var inputs = player_input_map.get(player_id)
@@ -183,18 +183,37 @@ func move_8way(delta):
 	#	move_and_collide(velocity * delta * 10)
 
 func animate():
-	var _inputs = player_input_map.get(player_id)
-	
-	if velocity.x > 0:
-		sprite.play("right")
-	elif velocity.x < 0:
-		sprite.play("left")
-	elif velocity.y > 0 and movement_type == MovementType.TOP_DOWN_8_WAY:
-		sprite.play("down")
-	elif velocity.y < 0 and movement_type == MovementType.TOP_DOWN_8_WAY:
-		sprite.play("up")
-	else:
-		sprite.stop()
+	match movement_type:
+		MovementType.SIDE:
+			if not is_on_floor():
+				if velocity.x > 5:
+					sprite.play("jump_right")
+				elif velocity.x < -5:
+					sprite.play("jump_left")
+				else:
+					sprite.play("jump_up")
+			else:
+				if velocity.x > 5:
+					sprite.play("right")
+				elif velocity.x < -5:
+					sprite.play("left")
+				else:
+					sprite.play("idle") 
+					
+		MovementType.TOP_DOWN_8_WAY:
+			if velocity.length() > 5:
+				if abs(velocity.x) > abs(velocity.y):
+					if velocity.x > 0:
+						sprite.play("right")
+					else:
+						sprite.play("left")
+				else:
+					if velocity.y > 0:
+						sprite.play("down")
+					else:
+						sprite.play("up")
+			else:
+				sprite.play("idle")
 		
 func eliminate():
 	eliminated = true

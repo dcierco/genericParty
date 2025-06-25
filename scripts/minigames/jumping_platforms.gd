@@ -7,7 +7,6 @@ const JUMP_VELOCITY = -550.0        # Moderate jump velocity
 const JUMP_GRAVITY_SCALE_UP = 0.9   # Slightly lighter gravity when moving up
 const JUMP_GRAVITY_SCALE_DOWN = 1.4 # Moderately heavier gravity when falling
 const PUSH_POWER = 1000.0
-
 const PUSH_RANGE = 60.0
 
 # Jump physics calculations
@@ -58,6 +57,7 @@ var eliminated_players = {}
 var current_pattern = PlatformPattern.ZIGZAG_DUAL
 var pattern_platforms_left = 0
 var platform_generation_height = 0
+var last_platform_positions: Array = []
 
 # Node references
 @onready var camera = $GameContainer/Camera2D
@@ -69,6 +69,7 @@ var platform_generation_height = 0
 @onready var debug_info = $GameContainer/DebugInfo
 @onready var height_label_p1 = $UI/HeightContainer/Player1HeightLabel
 @onready var height_label_p2 = $UI/HeightContainer/Player2HeightLabel
+@onready var tile_map = $GameContainer/TileMapLayer
 
 func _ready():
 	minigame_id = "jumping_platforms"
@@ -99,13 +100,16 @@ func initialize_minigame():
 	player_heights = {0: 0.0, 1: 0.0}
 	player_detailed_scores.clear()
 	eliminated_players.clear()
-
+	last_platform_positions.clear()
+	
 	# Reset height labels
 	if height_label_p1:
 		height_label_p1.text = "Player 1: 0m"
 	if height_label_p2:
 		height_label_p2.text = "Player 2: 0m"
-
+	
+	tile_map.clear()
+	
 	# Clear existing platforms
 	for platform in platform_container.get_children():
 		platform.queue_free()
@@ -163,37 +167,22 @@ func create_initial_platforms():
 	create_starting_platforms()
 
 func create_starting_platforms():
-	# Create fewer guaranteed reachable platforms near the starting position
 	var start_positions = [
-		Vector2(400, 650),   # Left platform
-		Vector2(880, 650),   # Right platform
-		Vector2(640, 580)    # Center platform higher up
+		Vector2(400, 650),
+		Vector2(880, 650),
+		Vector2(640, 580)
 	]
 
 	for pos in start_positions:
-		var platform = StaticBody2D.new()
-		platform.name = "StartingPlatform_" + str(platform_container.get_child_count())
-		platform.collision_layer = 1
-		platform.collision_mask = 0
-
-		var collision = CollisionShape2D.new()
-		var shape = RectangleShape2D.new()
-		shape.size = Vector2(120, PLATFORM_HEIGHT)
-		collision.shape = shape
-		collision.one_way_collision = true
-		platform.add_child(collision)
-
-		var visual = ColorRect.new()
-		visual.size = Vector2(120, PLATFORM_HEIGHT)
-		visual.position = Vector2(-60, -PLATFORM_HEIGHT/2)
-		visual.color = Color(0.4, 0.3, 0.2)  # Standard brown
-		platform.add_child(visual)
-
-		platform.position = pos
-		platform_container.add_child(platform)
+		# Use the main create_platform_at function, forcing a specific width
+		create_platform_at(pos, Color.WHITE, 120)
 
 func start_gameplay():
 	super.start_gameplay()
+	
+	player1.movable = true
+	player2.movable = true
+	
 	print("JumpingPlatforms: Gameplay Started")
 
 	# Start platform spawning
@@ -413,7 +402,7 @@ func update_height_displays():
 func update_debug_display():
 	if debug_info:
 		debug_info.text = "Camera Y: " + str(int(current_camera_y)) + "\n"
-		debug_info.text += "Platforms: " + str(platform_container.get_child_count()) + "\n"
+		debug_info.text += "Tiles Used: " + str(tile_map.get_used_cells().size()) + "\n" # MODIFIED
 		debug_info.text += "Highest Player: " + str(int(highest_player_y)) + "\n"
 		debug_info.text += "P1 Height: " + str(int(player_heights.get(0, 0.0))) + "m\n"
 		debug_info.text += "P2 Height: " + str(int(player_heights.get(1, 0.0))) + "m"
@@ -591,55 +580,45 @@ func is_platform_reachable(from_pos: Vector2, to_pos: Vector2) -> bool:
 	return true
 
 func get_last_platform_positions() -> Array:
-	# Get positions of recently created platforms for reachability checking
-	var positions = []
-	var platform_count = platform_container.get_child_count()
-	var check_count = min(5, platform_count)  # Check last 5 platforms
+	return last_platform_positions
 
-	for i in range(check_count):
-		var platform = platform_container.get_child(platform_count - 1 - i)
-		positions.append(platform.position)
-
-	return positions
-
-func create_platform_at(pos: Vector2, color: Color, width: float = -1):
-	# Validate reachability from recent platforms
+func create_platform_at(pos: Vector2, _color: Color, width: float = -1):
+	# Reachability logic
 	var recent_positions = get_last_platform_positions()
 	var is_reachable = false
+	if recent_positions.size() > 0:
+		for recent_pos in recent_positions:
+			if is_platform_reachable(recent_pos, pos):
+				is_reachable = true
+				break
+		if not is_reachable:
+			pos = adjust_position_for_reachability(recent_positions.back(), pos)
+	
+	# Add to our tracking array for the next platform's reachability check
+	last_platform_positions.append(pos)
+	if last_platform_positions.size() > 5: # Keep the list small
+		last_platform_positions.pop_front()
+		
+	# --- New TileMap Generation Logic ---
+	if not tile_map:
+		printerr("TileMap node not assigned! Cannot create platform.")
+		return
 
-	for recent_pos in recent_positions:
-		if is_platform_reachable(recent_pos, pos):
-			is_reachable = true
-			break
-
-	# If not reachable, adjust position to make it reachable
-	if not is_reachable and recent_positions.size() > 0:
-		var closest_pos = recent_positions[0]
-		var adjusted_pos = adjust_position_for_reachability(closest_pos, pos)
-		pos = adjusted_pos
-
-	var platform = StaticBody2D.new()
-	platform.name = "Platform_" + str(platform_container.get_child_count())
-	platform.collision_layer = 1  # World layer
-	platform.collision_mask = 0
-
-	var collision = CollisionShape2D.new()
-	var shape = RectangleShape2D.new()
 	var platform_width = width if width > 0 else randf_range(PLATFORM_WIDTH_MIN, PLATFORM_WIDTH_MAX)
-	shape.size = Vector2(platform_width, PLATFORM_HEIGHT)
-	collision.shape = shape
-	collision.one_way_collision = true
-	platform.add_child(collision)
+	var tile_size = tile_map.tile_set.tile_size
+	var num_tiles = int(platform_width / tile_size.x)
+	if num_tiles < 2: num_tiles = 2 # Ensure at least a left/right corner can be formed
 
-	var visual = ColorRect.new()
-	visual.size = Vector2(platform_width, PLATFORM_HEIGHT)
-	visual.position = Vector2(-platform_width/2, -PLATFORM_HEIGHT/2)
-	visual.color = color
-	platform.add_child(visual)
+	var start_coord = tile_map.local_to_map(pos - Vector2(platform_width / 2.0, 0))
+	var platform_cells = []
+	for i in range(num_tiles):
+		platform_cells.append(start_coord + Vector2i(i, 0))
 
-	platform.position = pos
-	platform_container.add_child(platform)
-
+	# The second argument still needs to be a PackedVector2iArray.
+	# By providing the full path, we avoid potential issues with the function's
+	# internal pathfinding.
+	tile_map.set_cells_terrain_path(platform_cells, 0, 0, 0)
+	
 func adjust_position_for_reachability(from_pos: Vector2, target_pos: Vector2) -> Vector2:
 	# Adjust target position to be reachable from from_pos
 	var horizontal_distance = target_pos.x - from_pos.x
@@ -660,10 +639,16 @@ func adjust_position_for_reachability(from_pos: Vector2, target_pos: Vector2) ->
 
 func cleanup_old_platforms():
 	var cleanup_threshold = current_camera_y + 1000
-
-	for platform in platform_container.get_children():
-		if platform.position.y > cleanup_threshold:
-			platform.queue_free()
+	var cells_to_erase = []
+	
+	var used_cells = tile_map.get_used_cells()
+	for cell_coord in used_cells:
+		var cell_world_pos = tile_map.map_to_local(cell_coord)
+		if cell_world_pos.y > cleanup_threshold:
+			cells_to_erase.append(cell_coord)
+			
+	for cell in cells_to_erase:
+		tile_map.set_cell(cell)
 
 func process_playing(delta):
 	# Check if game should end due to time

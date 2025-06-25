@@ -134,6 +134,9 @@ func reset_spiral():
 func start_gameplay():
 	print("Shrinking Platform: Starting")
 	super.start_gameplay()
+	
+	player1.movable = true
+	player2.movable = true
 
 	# Make sure players are visible and active
 	if is_instance_valid(player1):
