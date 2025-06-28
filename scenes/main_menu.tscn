@@ -77,3 +77,4 @@ text = "Version 0.1"
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_ekxnf")
 bus = &"Menu BGM"
+parameters/looping = true

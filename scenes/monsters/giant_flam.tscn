@@ -1,0 +1,59 @@
+[gd_scene load_steps=9 format=3 uid="uid://d2ujfhawnji1q"]
+
+[ext_resource type="Texture2D" uid="uid://bhf0en8vef72b" path="res://sprites/monsters/GiantFlam.png" id="1_ykvwq"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ykvwq"]
+atlas = ExtResource("1_ykvwq")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pp50j"]
+atlas = ExtResource("1_ykvwq")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_31mng"]
+atlas = ExtResource("1_ykvwq")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0pdir"]
+atlas = ExtResource("1_ykvwq")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ehfr7"]
+atlas = ExtResource("1_ykvwq")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kba0l"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ykvwq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pp50j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_31mng")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0pdir")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ehfr7")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ykvwq"]
+radius = 45.0
+
+[node name="GiantFlam" type="RigidBody2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_kba0l")
+frame_progress = 0.66805
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-1.5, 1.5)
+shape = SubResource("CircleShape2D_ykvwq")

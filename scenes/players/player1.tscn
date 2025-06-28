@@ -5,9 +5,6 @@
 [ext_resource type="AudioStream" uid="uid://cq6l0u1k4kg33" path="res://sfx/Jump.wav" id="3_grvfi"]
 [ext_resource type="AudioStream" uid="uid://dab4c8chglyc7" path="res://sfx/Sword2.wav" id="4_kfsk3"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_74k8n"]
-size = Vector2(24, 24)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_c47yy"]
 atlas = ExtResource("2_jdokp")
 region = Rect2(0, 0, 48, 48)
@@ -239,8 +236,15 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_74k8n"]
+size = Vector2(24, 24)
+
 [node name="Player1" type="CharacterBody2D" groups=["Player"]]
 script = ExtResource("1_c47yy")
+
+[node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_ghlg1")
+animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 scale = Vector2(2, 2)
@@ -253,7 +257,3 @@ bus = &"SFX"
 [node name="EliminatedSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("4_kfsk3")
 bus = &"SFX"
-
-[node name="PlayerSprite" type="AnimatedSprite2D" parent="."]
-sprite_frames = SubResource("SpriteFrames_ghlg1")
-animation = &"idle"

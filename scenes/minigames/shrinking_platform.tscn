@@ -66,3 +66,4 @@ Spiral Position: (0,0)"
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
 stream = ExtResource("3_6u6yj")
 bus = &"Minigames BGM"
+parameters/looping = true

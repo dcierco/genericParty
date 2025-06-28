@@ -2,22 +2,22 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://chmjcu6n3ldig"
-path="res://.godot/imported/FlagBlue16x16.png-2d89ee9ba46db334a6cf53a1142143d8.ctex"
+uid="uid://dwxhn2wvhyi51"
+path="res://.godot/imported/SpriteSheet16x16.png-a7417e48c3d44194a8b1ca4770a440ca.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/FlagBlue16x16.png"
-dest_files=["res://.godot/imported/FlagBlue16x16.png-2d89ee9ba46db334a6cf53a1142143d8.ctex"]
+source_file="res://sprites/elements/SpriteSheet16x16.png"
+dest_files=["res://.godot/imported/SpriteSheet16x16.png-a7417e48c3d44194a8b1ca4770a440ca.ctex"]
 
 [params]
 
 compress/mode=0
 compress/high_quality=false
-compress/lossy_quality=1.0
+compress/lossy_quality=0.7
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

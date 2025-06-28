@@ -197,3 +197,4 @@ tile_set = SubResource("TileSet_eiol1")
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
 stream = ExtResource("3_uum82")
 bus = &"Minigames BGM"
+parameters/looping = true

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d1viomr07r6pe"
-path="res://.godot/imported/FlagRed16x16.png-6992f322a7e4f7118158544c0238cf6d.ctex"
+uid="uid://cu8ghb5kqwy4k"
+path="res://.godot/imported/TilesetInteriorFloor.png-6522bf5bbf5b4a0e6d239fc4719e1e7f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/FlagRed16x16.png"
-dest_files=["res://.godot/imported/FlagRed16x16.png-6992f322a7e4f7118158544c0238cf6d.ctex"]
+source_file="res://sprites/tilesets/TilesetInteriorFloor.png"
+dest_files=["res://.godot/imported/TilesetInteriorFloor.png-6522bf5bbf5b4a0e6d239fc4719e1e7f.ctex"]
 
 [params]
 

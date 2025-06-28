@@ -1,0 +1,47 @@
+[gd_scene load_steps=8 format=3 uid="uid://b631s3bdugvne"]
+
+[ext_resource type="Script" uid="uid://duepit48rjuwr" path="res://scripts/lion.gd" id="1_wgvx7"]
+[ext_resource type="Texture2D" uid="uid://cewwq5hr7svfa" path="res://sprites/monsters/Lion.png" id="2_mtfac"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0bb7e"]
+atlas = ExtResource("2_mtfac")
+region = Rect2(0, 0, 75, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3i5cb"]
+atlas = ExtResource("2_mtfac")
+region = Rect2(76, 0, 104, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_jwk8t"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0bb7e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3i5cb")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xeask"]
+size = Vector2(76, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ew47q"]
+size = Vector2(104, 48)
+
+[node name="Lion" type="RigidBody2D"]
+script = ExtResource("1_wgvx7")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_jwk8t")
+
+[node name="CollisionShape2D_Frame0" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_xeask")
+
+[node name="CollisionShape2D_Frame1" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ew47q")
+disabled = true
+
+[connection signal="frame_changed" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_frame_changed"]

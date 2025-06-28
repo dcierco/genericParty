@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bnmmhx6saxoah"
-path="res://.godot/imported/TopSheet16x16.png-3d8ae1a96443dcf4e9f4ea104f7a2b59.ctex"
+uid="uid://d1viomr07r6pe"
+path="res://.godot/imported/FlagRed16x16.png-a69473059ad11af6d11552bc22140a2b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/TopSheet16x16.png"
-dest_files=["res://.godot/imported/TopSheet16x16.png-3d8ae1a96443dcf4e9f4ea104f7a2b59.ctex"]
+source_file="res://sprites/elements/FlagRed16x16.png"
+dest_files=["res://.godot/imported/FlagRed16x16.png-a69473059ad11af6d11552bc22140a2b.ctex"]
 
 [params]
 
