@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_5dvjb"]
 [ext_resource type="Script" uid="uid://c174wihqcqh31" path="res://scripts/minigames/shrinking_platform.gd" id="2_1bghx"]
-[ext_resource type="AudioStream" uid="uid://bmcardpuw8qny" path="res://sfx/24 - Final Area.ogg" id="3_6u6yj"]
+[ext_resource type="AudioStream" uid="uid://bmcardpuw8qny" path="res://assets/sfx/24 - Final Area.ogg" id="3_6u6yj"]
 [ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_go7ha"]
 [ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_0m74l"]
 
@@ -66,3 +66,4 @@ Spiral Position: (0,0)"
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
 stream = ExtResource("3_6u6yj")
 bus = &"Minigames BGM"
+parameters/looping = true

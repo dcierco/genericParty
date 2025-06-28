@@ -5,10 +5,11 @@ A 2D party game inspired by Mario Party, developed in Godot 4.4.1. The game feat
 ## Game Overview
 
 Generic Party is a multiplayer party game where:
-- Players compete in various minigames
-- The minigame selection screen allows choosing specific minigames
-- Each minigame has its own scoring system
-- Results are shown after each minigame
+- Players compete in various minigames in **Party Mode**
+- The minigame selection screen shows cumulative scores across all games
+- Each completed minigame is removed from the list
+- When all minigames are completed, final party results are displayed
+- Each minigame has its own scoring system with first place bonuses and completion rewards
 
 ## Code Structure
 
@@ -31,29 +32,38 @@ This approach allows each individual minigame to focus on its specific gameplay 
 ├── assets/            # Game assets (sprites, sounds, etc.)
 ├── scenes/
 │   ├── main_menu.tscn           # Main menu
-│   ├── minigame_select.tscn     # Minigame selection screen
+│   ├── minigame_select.tscn     # Minigame selection screen with party mode
+│   ├── party_results.tscn       # Final results screen
 │   └── minigames/
 │       ├── minigame_base.tscn   # Base minigame template
-│       ├── race_game.tscn       # Button mashing race
-│       └── shrinking_platform.tscn # Shrinking platform survival
+│       ├── race_game.tscn       # Reflex-based race game
+│       ├── shrinking_platform.tscn # Shrinking platform survival
+│       ├── avoid_the_obstacles.tscn # Obstacle dodging game
+│       └── jumping_platforms.tscn # Vertical platforming challenge
 ├── scripts/
 │   ├── globals/
 │   │   ├── game_manager.gd      # Game state management
-│   │   └── minigame_manager.gd  # Minigame loading/selection
+│   │   ├── minigame_manager.gd  # Minigame loading/selection
+│   │   └── global_score_manager.gd # Party mode score tracking
+│   ├── party_results.gd         # Final party results screen
 │   └── minigames/
 │       ├── minigame_base.gd     # Base minigame class
-│       ├── race_game.gd         # Race minigame implementation
-│       └── shrinking_platform.gd # Platform survival minigame
+│       ├── race_game.gd         # Reflex-based race implementation
+│       ├── shrinking_platform.gd # Platform survival minigame
+│       ├── avoid_the_obstacles.gd # Obstacle dodging implementation
+│       └── jumping_platforms.gd # Vertical platforming implementation
 ```
 
 ## Current Minigames
 
 ### Race Game
-A button-mashing race where players must rapidly press their action button to move their character toward the finish line. The first player to reach the finish line wins.
+A reflex-based race where players must press the correct button shown on screen to advance their character. Random button prompts appear that players must respond to quickly and accurately.
 
-- **Controls**: Player 1: Space, Player 2: Enter
-- **Time Limit**: 10 seconds
-- **Scoring**: First to finish gets the highest score
+- **Controls**: 
+  - Player 1: A/D/W/S/Space
+  - Player 2: Arrow Keys/Enter
+- **Time Limit**: 25 seconds
+- **Scoring**: +100 points per distance traveled, +50 first place bonus, +200 completion bonus
 
 ### Shrinking Platform
 A survival minigame where players try to stay on a platform as it gets consumed by lava in a spiral pattern. Players can push each other to knock opponents into the lava.
@@ -81,7 +91,14 @@ A vertical platforming challenge where players must jump on procedurally generat
   - Player 2: Left/Right Arrows (move) + Up Arrow (jump) + Enter (push)
 - **Time Limit**: 60 seconds
 - **Features**: One-way collision platforms, dynamic camera movement, procedural generation
-- **Scoring**: Points based on height reached, bonus for being last player standing
+- **Scoring**: +10 points per meter climbed, +50 first place bonus, +100 survival bonus
+
+## Party Mode Features
+
+- **Global Score Tracking**: Cumulative scores across all minigames
+- **Game Progression**: Completed minigames are removed from the selection list
+- **Final Results**: Comprehensive results screen with winner announcement, full rankings, and detailed score breakdowns
+- **Action Options**: Start new party, return to main menu, or exit game
 
 ## Getting Started
 

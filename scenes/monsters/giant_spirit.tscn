@@ -1,0 +1,59 @@
+[gd_scene load_steps=9 format=3 uid="uid://cj0xavg38odca"]
+
+[ext_resource type="Texture2D" uid="uid://bpbtx1dmbd53y" path="res://assets/sprites/monsters/GiantSpirit.png" id="1_vsg6o"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vsg6o"]
+atlas = ExtResource("1_vsg6o")
+region = Rect2(0, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_emqpy"]
+atlas = ExtResource("1_vsg6o")
+region = Rect2(100, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2d4jf"]
+atlas = ExtResource("1_vsg6o")
+region = Rect2(200, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1gpiw"]
+atlas = ExtResource("1_vsg6o")
+region = Rect2(300, 0, 100, 100)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0uj08"]
+atlas = ExtResource("1_vsg6o")
+region = Rect2(400, 0, 100, 100)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kba0l"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vsg6o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_emqpy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2d4jf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1gpiw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0uj08")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vsg6o"]
+radius = 45.0
+
+[node name="GiantSpirit" type="RigidBody2D"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_kba0l")
+frame_progress = 0.724801
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-1.5, 1.5)
+shape = SubResource("CircleShape2D_vsg6o")

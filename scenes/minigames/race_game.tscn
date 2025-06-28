@@ -1,10 +1,12 @@
-[gd_scene load_steps=18 format=3 uid="uid://cw4cbf0gvsnuw"]
+[gd_scene load_steps=29 format=3 uid="uid://cw4cbf0gvsnuw"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_7f2yl"]
 [ext_resource type="Script" uid="uid://chv02urimxmlt" path="res://scripts/minigames/race_game.gd" id="2_3w2rc"]
-[ext_resource type="Texture2D" uid="uid://dnygpdpfv7h43" path="res://sprites/MonkeyBoxerRed_SpriteSheet.png" id="3_m5c4s"]
-[ext_resource type="Texture2D" uid="uid://1tw38874xosb" path="res://sprites/MonkeyBoxerBlue_SpriteSheet.png" id="4_a4idd"]
-[ext_resource type="AudioStream" uid="uid://6mnl3iv8u4lw" path="res://sfx/17 - Fight.ogg" id="5_a4idd"]
+[ext_resource type="Texture2D" uid="uid://dnygpdpfv7h43" path="res://assets/sprites/players/MonkeyBoxerRed_SpriteSheet.png" id="3_m5c4s"]
+[ext_resource type="Texture2D" uid="uid://chmjcu6n3ldig" path="res://assets/sprites/elements/FlagBlue16x16.png" id="4_7taso"]
+[ext_resource type="Texture2D" uid="uid://1tw38874xosb" path="res://assets/sprites/players/MonkeyBoxerBlue_SpriteSheet.png" id="4_a4idd"]
+[ext_resource type="Texture2D" uid="uid://d1viomr07r6pe" path="res://assets/sprites/elements/FlagRed16x16.png" id="4_jeo6c"]
+[ext_resource type="AudioStream" uid="uid://6mnl3iv8u4lw" path="res://assets/sfx/17 - Fight.ogg" id="5_a4idd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
 bg_color = Color(1, 0.2, 0.2, 1)
@@ -19,6 +21,75 @@ corner_radius_top_left = 3
 corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nrdyo"]
+atlas = ExtResource("4_7taso")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qjobc"]
+atlas = ExtResource("4_7taso")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0hftp"]
+atlas = ExtResource("4_7taso")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lhbus"]
+atlas = ExtResource("4_7taso")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0yv2q"]
+atlas = ExtResource("4_jeo6c")
+region = Rect2(0, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nnurl"]
+atlas = ExtResource("4_jeo6c")
+region = Rect2(48, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hqd78"]
+atlas = ExtResource("4_jeo6c")
+region = Rect2(96, 0, 48, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ieruj"]
+atlas = ExtResource("4_jeo6c")
+region = Rect2(144, 0, 48, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0yv2q"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nrdyo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qjobc")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0hftp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lhbus")
+}],
+"loop": true,
+"name": &"blue_flag",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0yv2q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nnurl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hqd78")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ieruj")
+}],
+"loop": true,
+"name": &"red_flag",
+"speed": 5.0
+}]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7taso"]
 atlas = ExtResource("3_m5c4s")
@@ -186,13 +257,11 @@ offset_bottom = 45.0
 mouse_filter = 2
 color = Color(0.4, 0.4, 0.4, 1)
 
-[node name="FinishMarker" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane1" index="1"]
-layout_mode = 0
-offset_left = 845.0
-offset_top = 22.0
-offset_right = 850.0
-offset_bottom = 52.0
-color = Color(1, 1, 0, 1)
+[node name="FinishFlag" type="AnimatedSprite2D" parent="GameContainer/PlayerLanes/PlayerLane1" index="1"]
+position = Vector2(859, 24)
+sprite_frames = SubResource("SpriteFrames_0yv2q")
+animation = &"red_flag"
+autoplay = "red_flag"
 
 [node name="PlayerLabel" type="Label" parent="GameContainer/PlayerLanes/PlayerLane1" index="2"]
 layout_mode = 0
@@ -224,15 +293,7 @@ offset_bottom = 45.0
 mouse_filter = 2
 color = Color(0.4, 0.4, 0.4, 1)
 
-[node name="FinishMarker" type="ColorRect" parent="GameContainer/PlayerLanes/PlayerLane2" index="1"]
-layout_mode = 0
-offset_left = 845.0
-offset_top = 22.0
-offset_right = 850.0
-offset_bottom = 52.0
-color = Color(1, 1, 0, 1)
-
-[node name="PlayerLabel" type="Label" parent="GameContainer/PlayerLanes/PlayerLane2" index="2"]
+[node name="PlayerLabel" type="Label" parent="GameContainer/PlayerLanes/PlayerLane2" index="1"]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 20.0
@@ -240,6 +301,12 @@ offset_right = 37.0
 offset_bottom = 46.0
 theme_override_font_sizes/font_size = 20
 text = "P2"
+
+[node name="FinishFlag" type="AnimatedSprite2D" parent="GameContainer/PlayerLanes/PlayerLane2" index="2"]
+position = Vector2(859, 24)
+sprite_frames = SubResource("SpriteFrames_0yv2q")
+animation = &"blue_flag"
+autoplay = "blue_flag"
 
 [node name="PlayerSprite" type="Node2D" parent="GameContainer/PlayerLanes/PlayerLane2" index="3"]
 position = Vector2(50, 30)
@@ -251,3 +318,4 @@ sprite_frames = SubResource("SpriteFrames_qjobc")
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
 stream = ExtResource("5_a4idd")
 bus = &"Minigames BGM"
+parameters/looping = true

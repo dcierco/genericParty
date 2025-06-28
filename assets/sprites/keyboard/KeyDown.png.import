@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dnygpdpfv7h43"
-path="res://.godot/imported/MonkeyBoxerRed_SpriteSheet.png-ea8ad0ed8ca9ef13b22b1e378aba266e.ctex"
+uid="uid://8aj2y5hc1odc"
+path="res://.godot/imported/KeyDown.png-2454d686bff8f0be47fa923d102a44b9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/MonkeyBoxerRed_SpriteSheet.png"
-dest_files=["res://.godot/imported/MonkeyBoxerRed_SpriteSheet.png-ea8ad0ed8ca9ef13b22b1e378aba266e.ctex"]
+source_file="res://assets/sprites/keyboard/KeyDown.png"
+dest_files=["res://.godot/imported/KeyDown.png-2454d686bff8f0be47fa923d102a44b9.ctex"]
 
 [params]
 

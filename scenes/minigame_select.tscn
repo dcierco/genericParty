@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://dgdxquwqf3pqw"]
 
 [ext_resource type="Script" uid="uid://bucyexbiq4vtu" path="res://scripts/minigame_select.gd" id="1_76ert"]
-[ext_resource type="AudioStream" uid="uid://o5aw6v10cwk1" path="res://sfx/3 - Revelation.ogg" id="2_ncchc"]
+[ext_resource type="AudioStream" uid="uid://o5aw6v10cwk1" path="res://assets/sfx/3 - Revelation.ogg" id="2_ncchc"]
 
 [node name="MinigameSelect" type="Control"]
 layout_mode = 3
@@ -124,3 +124,4 @@ text = "Play Selected"
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_ncchc")
 bus = &"Menu BGM"
+parameters/looping = true

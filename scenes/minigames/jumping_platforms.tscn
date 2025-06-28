@@ -1,13 +1,107 @@
-[gd_scene load_steps=7 format=3 uid="uid://843pyc871ejq"]
+[gd_scene load_steps=12 format=4 uid="uid://843pyc871ejq"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://d3m8lal6p2n1" path="res://scripts/minigames/jumping_platforms.gd" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_7ts5n"]
-[ext_resource type="AudioStream" uid="uid://ca63miah030k5" path="res://sfx/34  - Fight.ogg" id="3_uum82"]
+[ext_resource type="AudioStream" uid="uid://ca63miah030k5" path="res://assets/sfx/34  - Fight.ogg" id="3_uum82"]
 [ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_bf7lg"]
+[ext_resource type="Texture2D" uid="uid://b2s4yk4g4hcyy" path="res://assets/sprites/tilesets/TilesetField.png" id="5_1yarn"]
+[ext_resource type="Texture2D" uid="uid://dg2x47p7u2fsl" path="res://assets/sprites/tilesets/platform.png" id="5_bf7lg"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
-size = Vector2(1280, 40)
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_eiol1"]
+texture = ExtResource("5_1yarn")
+0:3/0 = 0
+0:3/0/terrain_set = 0
+0:3/0/terrain = 0
+0:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:3/0/terrains_peering_bit/right_side = 0
+0:3/0/terrains_peering_bit/bottom_right_corner = 0
+0:3/0/terrains_peering_bit/bottom_side = 0
+0:4/0 = 0
+0:4/0/terrain_set = 0
+0:4/0/terrain = 0
+0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:4/0/terrains_peering_bit/right_side = 0
+0:4/0/terrains_peering_bit/bottom_right_corner = 0
+0:4/0/terrains_peering_bit/bottom_side = 0
+0:4/0/terrains_peering_bit/top_side = 0
+0:4/0/terrains_peering_bit/top_right_corner = 0
+1:3/0 = 0
+1:3/0/terrain_set = 0
+1:3/0/terrain = 0
+1:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:3/0/terrains_peering_bit/right_side = 0
+1:3/0/terrains_peering_bit/bottom_right_corner = 0
+1:3/0/terrains_peering_bit/bottom_side = 0
+1:3/0/terrains_peering_bit/bottom_left_corner = 0
+1:3/0/terrains_peering_bit/left_side = 0
+1:4/0 = 0
+1:4/0/terrain_set = 0
+1:4/0/terrain = 0
+1:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:4/0/terrains_peering_bit/right_side = 0
+1:4/0/terrains_peering_bit/bottom_right_corner = 0
+1:4/0/terrains_peering_bit/bottom_side = 0
+1:4/0/terrains_peering_bit/bottom_left_corner = 0
+1:4/0/terrains_peering_bit/left_side = 0
+1:4/0/terrains_peering_bit/top_left_corner = 0
+1:4/0/terrains_peering_bit/top_side = 0
+1:4/0/terrains_peering_bit/top_right_corner = 0
+2:3/0 = 0
+2:3/0/terrain_set = 0
+2:3/0/terrain = 0
+2:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:3/0/terrains_peering_bit/bottom_side = 0
+2:3/0/terrains_peering_bit/bottom_left_corner = 0
+2:3/0/terrains_peering_bit/left_side = 0
+2:4/0 = 0
+2:4/0/terrain_set = 0
+2:4/0/terrain = 0
+2:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:4/0/terrains_peering_bit/bottom_side = 0
+2:4/0/terrains_peering_bit/bottom_left_corner = 0
+2:4/0/terrains_peering_bit/left_side = 0
+2:4/0/terrains_peering_bit/top_left_corner = 0
+2:4/0/terrains_peering_bit/top_side = 0
+3:5/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_72dof"]
+physics_layer_0/collision_layer = 3
+physics_layer_0/collision_mask = 3
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "ground"
+terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
+sources/0 = SubResource("TileSetAtlasSource_eiol1")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1yarn"]
+texture = ExtResource("5_bf7lg")
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:0/0/physics_layer_0/polygon_0/one_way = true
+0:0/0/terrains_peering_bit/right_side = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0/physics_layer_0/polygon_0/one_way = true
+1:0/0/terrains_peering_bit/right_side = 0
+1:0/0/terrains_peering_bit/left_side = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0/physics_layer_0/polygon_0/one_way = true
+2:0/0/terrains_peering_bit/left_side = 0
+
+[sub_resource type="TileSet" id="TileSet_eiol1"]
+physics_layer_0/collision_layer = 3
+physics_layer_0/collision_mask = 3
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "platform 0"
+terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
+sources/0 = SubResource("TileSetAtlasSource_1yarn")
 
 [node name="JumpingPlatforms" instance=ExtResource("1_base")]
 script = ExtResource("2_script")
@@ -60,7 +154,6 @@ offset_top = -5000.0
 offset_right = 5000.0
 offset_bottom = 5000.0
 color = Color(0.2, 0.6, 0.9, 1)
-metadata/_edit_lock_ = true
 
 [node name="PlatformSpawnTimer" type="Timer" parent="GameContainer" index="2"]
 wait_time = 0.5
@@ -83,20 +176,10 @@ position = Vector2(740, 720)
 
 [node name="Player2" parent="GameContainer/Players" index="1" instance=ExtResource("4_bf7lg")]
 
-[node name="GroundPlatform" type="StaticBody2D" parent="GameContainer" index="6"]
+[node name="GroundPlatform" type="TileMapLayer" parent="GameContainer" index="6"]
 position = Vector2(640, 750)
-collision_mask = 0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/GroundPlatform" index="0"]
-position = Vector2(0, 10)
-shape = SubResource("RectangleShape2D_platform")
-
-[node name="ColorRect" type="ColorRect" parent="GameContainer/GroundPlatform" index="1"]
-offset_left = -640.0
-offset_top = -10.0
-offset_right = 640.0
-offset_bottom = 50.0
-color = Color(0.2, 0.5, 0.2, 1)
+tile_map_data = PackedByteArray("AAAnAAIAAAACAAQAAAAnAAEAAAACAAQAAAAnAAAAAAACAAQAAAAnAP//AAACAAMAAAAmAAIAAAABAAQAAAAmAAEAAAABAAQAAAAmAAAAAAABAAQAAAAmAP//AAABAAMAAAAlAAIAAAABAAQAAAAlAAEAAAABAAQAAAAlAAAAAAABAAQAAAAlAP//AAABAAMAAAAkAAIAAAABAAQAAAAkAAEAAAABAAQAAAAkAAAAAAABAAQAAAAkAP//AAABAAMAAAAjAAIAAAABAAQAAAAjAAEAAAABAAQAAAAjAAAAAAABAAQAAAAjAP//AAABAAMAAAAiAAIAAAABAAQAAAAiAAEAAAABAAQAAAAiAAAAAAABAAQAAAAiAP//AAABAAMAAAAhAAIAAAABAAQAAAAhAAEAAAABAAQAAAAhAAAAAAABAAQAAAAhAP//AAABAAMAAAAgAAIAAAABAAQAAAAgAAEAAAABAAQAAAAgAAAAAAABAAQAAAAgAP//AAABAAMAAAAfAAIAAAABAAQAAAAfAAEAAAABAAQAAAAfAAAAAAABAAQAAAAfAP//AAABAAMAAAAeAAIAAAABAAQAAAAeAAEAAAABAAQAAAAeAAAAAAABAAQAAAAeAP//AAABAAMAAAAdAAIAAAABAAQAAAAdAAEAAAABAAQAAAAdAAAAAAABAAQAAAAdAP//AAABAAMAAAAcAAIAAAABAAQAAAAcAAEAAAABAAQAAAAcAAAAAAABAAQAAAAcAP//AAABAAMAAAAbAAIAAAABAAQAAAAbAAEAAAABAAQAAAAbAAAAAAABAAQAAAAbAP//AAABAAMAAAAaAAIAAAABAAQAAAAaAAEAAAABAAQAAAAaAAAAAAABAAQAAAAaAP//AAABAAMAAAAZAAIAAAABAAQAAAAZAAEAAAABAAQAAAAZAAAAAAABAAQAAAAZAP//AAABAAMAAAAYAAIAAAABAAQAAAAYAAEAAAABAAQAAAAYAAAAAAABAAQAAAAYAP//AAABAAMAAAAXAAIAAAABAAQAAAAXAAEAAAABAAQAAAAXAAAAAAABAAQAAAAXAP//AAABAAMAAAAWAAIAAAABAAQAAAAWAAEAAAABAAQAAAAWAAAAAAABAAQAAAAWAP//AAABAAMAAAAVAAIAAAABAAQAAAAVAAEAAAABAAQAAAAVAAAAAAABAAQAAAAVAP//AAABAAMAAAAUAAIAAAABAAQAAAAUAAEAAAABAAQAAAAUAAAAAAABAAQAAAAUAP//AAABAAMAAAATAAIAAAABAAQAAAATAAEAAAABAAQAAAATAAAAAAABAAQAAAATAP//AAABAAMAAAASAAIAAAABAAQAAAASAAEAAAABAAQAAAASAAAAAAABAAQAAAASAP//AAABAAMAAAARAAIAAAABAAQAAAARAAEAAAABAAQAAAARAAAAAAABAAQAAAARAP//AAABAAMAAAAQAAIAAAABAAQAAAAQAAEAAAABAAQAAAAQAAAAAAABAAQAAAAQAP//AAABAAMAAAAPAAIAAAABAAQAAAAPAAEAAAABAAQAAAAPAAAAAAABAAQAAAAPAP//AAABAAMAAAAOAAIAAAABAAQAAAAOAAEAAAABAAQAAAAOAAAAAAABAAQAAAAOAP//AAABAAMAAAANAAIAAAABAAQAAAANAAEAAAABAAQAAAANAAAAAAABAAQAAAANAP//AAABAAMAAAAMAAIAAAABAAQAAAAMAAEAAAABAAQAAAAMAAAAAAABAAQAAAAMAP//AAABAAMAAAALAAIAAAABAAQAAAALAAEAAAABAAQAAAALAAAAAAABAAQAAAALAP//AAABAAMAAAAKAAIAAAABAAQAAAAKAAEAAAABAAQAAAAKAAAAAAABAAQAAAAKAP//AAABAAMAAAAJAAIAAAABAAQAAAAJAAEAAAABAAQAAAAJAAAAAAABAAQAAAAJAP//AAABAAMAAAAIAAIAAAABAAQAAAAIAAEAAAABAAQAAAAIAAAAAAABAAQAAAAIAP//AAABAAMAAAAHAAIAAAABAAQAAAAHAAEAAAABAAQAAAAHAAAAAAABAAQAAAAHAP//AAABAAMAAAAGAAIAAAABAAQAAAAGAAEAAAABAAQAAAAGAAAAAAABAAQAAAAGAP//AAABAAMAAAAFAAIAAAABAAQAAAAFAAEAAAABAAQAAAAFAAAAAAABAAQAAAAFAP//AAABAAMAAAAEAAIAAAABAAQAAAAEAAEAAAABAAQAAAAEAAAAAAABAAQAAAAEAP//AAABAAMAAAADAAIAAAABAAQAAAADAAEAAAABAAQAAAADAAAAAAABAAQAAAADAP//AAABAAMAAAACAAIAAAABAAQAAAACAAEAAAABAAQAAAACAAAAAAABAAQAAAACAP//AAABAAMAAAABAAIAAAABAAQAAAABAAEAAAABAAQAAAABAAAAAAABAAQAAAABAP//AAABAAMAAAAAAAIAAAABAAQAAAAAAAEAAAABAAQAAAAAAAAAAAABAAQAAAAAAP//AAABAAMAAAD//wIAAAABAAQAAAD//wEAAAABAAQAAAD//wAAAAABAAQAAAD/////AAABAAMAAAD+/wIAAAABAAQAAAD+/wEAAAABAAQAAAD+/wAAAAABAAQAAAD+////AAABAAMAAAD9/wIAAAABAAQAAAD9/wEAAAABAAQAAAD9/wAAAAABAAQAAAD9////AAABAAMAAAD8/wIAAAABAAQAAAD8/wEAAAABAAQAAAD8/wAAAAABAAQAAAD8////AAABAAMAAAD7/wIAAAABAAQAAAD7/wEAAAABAAQAAAD7/wAAAAABAAQAAAD7////AAABAAMAAAD6/wIAAAABAAQAAAD6/wEAAAABAAQAAAD6/wAAAAABAAQAAAD6////AAABAAMAAAD5/wIAAAABAAQAAAD5/wEAAAABAAQAAAD5/wAAAAABAAQAAAD5////AAABAAMAAAD4/wIAAAABAAQAAAD4/wEAAAABAAQAAAD4/wAAAAABAAQAAAD4////AAABAAMAAAD3/wIAAAABAAQAAAD3/wEAAAABAAQAAAD3/wAAAAABAAQAAAD3////AAABAAMAAAD2/wIAAAABAAQAAAD2/wEAAAABAAQAAAD2/wAAAAABAAQAAAD2////AAABAAMAAAD1/wIAAAABAAQAAAD1/wEAAAABAAQAAAD1/wAAAAABAAQAAAD1////AAABAAMAAAD0/wIAAAABAAQAAAD0/wEAAAABAAQAAAD0/wAAAAABAAQAAAD0////AAABAAMAAADz/wIAAAABAAQAAADz/wEAAAABAAQAAADz/wAAAAABAAQAAADz////AAABAAMAAADy/wIAAAABAAQAAADy/wEAAAABAAQAAADy/wAAAAABAAQAAADy////AAABAAMAAADx/wIAAAABAAQAAADx/wEAAAABAAQAAADx/wAAAAABAAQAAADx////AAABAAMAAADw/wIAAAABAAQAAADw/wEAAAABAAQAAADw/wAAAAABAAQAAADw////AAABAAMAAADv/wIAAAABAAQAAADv/wEAAAABAAQAAADv/wAAAAABAAQAAADv////AAABAAMAAADu/wIAAAABAAQAAADu/wEAAAABAAQAAADu/wAAAAABAAQAAADu////AAABAAMAAADt/wIAAAABAAQAAADt/wEAAAABAAQAAADt/wAAAAABAAQAAADt////AAABAAMAAADs/wIAAAABAAQAAADs/wEAAAABAAQAAADs/wAAAAABAAQAAADs////AAABAAMAAADr/wIAAAABAAQAAADr/wEAAAABAAQAAADr/wAAAAABAAQAAADr////AAABAAMAAADq/wIAAAABAAQAAADq/wEAAAABAAQAAADq/wAAAAABAAQAAADq////AAABAAMAAADp/wIAAAABAAQAAADp/wEAAAABAAQAAADp/wAAAAABAAQAAADp////AAABAAMAAADo/wIAAAABAAQAAADo/wEAAAABAAQAAADo/wAAAAABAAQAAADo////AAABAAMAAADn/wIAAAABAAQAAADn/wEAAAABAAQAAADn/wAAAAABAAQAAADn////AAABAAMAAADm/wIAAAABAAQAAADm/wEAAAABAAQAAADm/wAAAAABAAQAAADm////AAABAAMAAADl/wIAAAABAAQAAADl/wEAAAABAAQAAADl/wAAAAABAAQAAADl////AAABAAMAAADk/wIAAAABAAQAAADk/wEAAAABAAQAAADk/wAAAAABAAQAAADk////AAABAAMAAADj/wIAAAABAAQAAADj/wEAAAABAAQAAADj/wAAAAABAAQAAADj////AAABAAMAAADi/wIAAAABAAQAAADi/wEAAAABAAQAAADi/wAAAAABAAQAAADi////AAABAAMAAADh/wIAAAABAAQAAADh/wEAAAABAAQAAADh/wAAAAABAAQAAADh////AAABAAMAAADg/wIAAAABAAQAAADg/wEAAAABAAQAAADg/wAAAAABAAQAAADg////AAABAAMAAADf/wIAAAABAAQAAADf/wEAAAABAAQAAADf/wAAAAABAAQAAADf////AAABAAMAAADe/wIAAAABAAQAAADe/wEAAAABAAQAAADe/wAAAAABAAQAAADe////AAABAAMAAADd/wIAAAABAAQAAADd/wEAAAABAAQAAADd/wAAAAABAAQAAADd////AAABAAMAAADc/wIAAAABAAQAAADc/wEAAAABAAQAAADc/wAAAAABAAQAAADc////AAABAAMAAADb/wIAAAABAAQAAADb/wEAAAABAAQAAADb/wAAAAABAAQAAADb////AAABAAMAAADa/wIAAAABAAQAAADa/wEAAAABAAQAAADa/wAAAAABAAQAAADa////AAABAAMAAADZ/wIAAAABAAQAAADZ/wEAAAABAAQAAADZ/wAAAAABAAQAAADZ////AAABAAMAAADY/wIAAAAAAAQAAADY/wEAAAAAAAQAAADY/wAAAAAAAAQAAADY////AAAAAAMAAAA=")
+tile_set = SubResource("TileSet_72dof")
 
 [node name="DebugInfo" type="Label" parent="GameContainer" index="7"]
 offset_left = 20.0
@@ -108,6 +191,10 @@ text = "Camera Y: 0
 Platforms: 0
 Highest Player: 0"
 
+[node name="TileMapLayer" type="TileMapLayer" parent="GameContainer" index="8"]
+tile_set = SubResource("TileSet_eiol1")
+
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
 stream = ExtResource("3_uum82")
 bus = &"Minigames BGM"
+parameters/looping = true

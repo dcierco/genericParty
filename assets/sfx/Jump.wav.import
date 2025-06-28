@@ -2,13 +2,13 @@
 
 importer="wav"
 type="AudioStreamWAV"
-uid="uid://d27eomnpd5jd1"
-path="res://.godot/imported/Impact.wav-1251876b8e0f7391d2cf7e926de4fe97.sample"
+uid="uid://cq6l0u1k4kg33"
+path="res://.godot/imported/Jump.wav-9ab3632d4c2a3dafb5ae81748ee08591.sample"
 
 [deps]
 
-source_file="res://sfx/Impact.wav"
-dest_files=["res://.godot/imported/Impact.wav-1251876b8e0f7391d2cf7e926de4fe97.sample"]
+source_file="res://assets/sfx/Jump.wav"
+dest_files=["res://.godot/imported/Jump.wav-9ab3632d4c2a3dafb5ae81748ee08591.sample"]
 
 [params]
 

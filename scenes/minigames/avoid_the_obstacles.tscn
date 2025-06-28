@@ -1,10 +1,15 @@
-[gd_scene load_steps=9 format=3 uid="uid://c5j3f7k2l8g1"]
+[gd_scene load_steps=18 format=4 uid="uid://c5j3f7k2l8g1"]
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://c0la3uwclwi4" path="res://scripts/minigames/avoid_the_obstacles.gd" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_britd"]
-[ext_resource type="AudioStream" uid="uid://dhbs1s6q7f1aj" path="res://sfx/28 - Tension.ogg" id="3_vh6eq"]
+[ext_resource type="AudioStream" uid="uid://dhbs1s6q7f1aj" path="res://assets/sfx/28 - Tension.ogg" id="3_vh6eq"]
 [ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_vfxmd"]
+[ext_resource type="PackedScene" uid="uid://d2ujfhawnji1q" path="res://scenes/monsters/giant_flam.tscn" id="5_clq4u"]
+[ext_resource type="PackedScene" uid="uid://cj0xavg38odca" path="res://scenes/monsters/giant_spirit.tscn" id="6_ebwln"]
+[ext_resource type="Texture2D" uid="uid://cu8ghb5kqwy4k" path="res://assets/sprites/tilesets/TilesetInteriorFloor.png" id="6_ix58u"]
+[ext_resource type="PackedScene" uid="uid://b631s3bdugvne" path="res://scenes/monsters/lion.tscn" id="7_ix58u"]
+[ext_resource type="Texture2D" uid="uid://dujuapbobukqj" path="res://assets/sprites/tilesets/TilesetHole.png" id="7_ytbbu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
 bg_color = Color(1, 0.2, 0.2, 1)
@@ -20,11 +25,446 @@ corner_radius_top_right = 3
 corner_radius_bottom_right = 3
 corner_radius_bottom_left = 3
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ytbbu"]
+texture = ExtResource("6_ix58u")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+11:0/0 = 0
+12:0/0 = 0
+13:0/0 = 0
+14:0/0 = 0
+15:0/0 = 0
+16:0/0 = 0
+17:0/0 = 0
+18:0/0 = 0
+19:0/0 = 0
+20:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+7:1/0 = 0
+8:1/0 = 0
+9:1/0 = 0
+11:1/0 = 0
+12:1/0 = 0
+13:1/0 = 0
+14:1/0 = 0
+15:1/0 = 0
+16:1/0 = 0
+17:1/0 = 0
+18:1/0 = 0
+19:1/0 = 0
+20:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+7:2/0 = 0
+8:2/0 = 0
+9:2/0 = 0
+10:2/0 = 0
+11:2/0 = 0
+12:2/0 = 0
+13:2/0 = 0
+14:2/0 = 0
+15:2/0 = 0
+16:2/0 = 0
+17:2/0 = 0
+18:2/0 = 0
+19:2/0 = 0
+20:2/0 = 0
+21:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+7:3/0 = 0
+8:3/0 = 0
+9:3/0 = 0
+10:3/0 = 0
+11:3/0 = 0
+12:3/0 = 0
+13:3/0 = 0
+14:3/0 = 0
+15:3/0 = 0
+16:3/0 = 0
+17:3/0 = 0
+18:3/0 = 0
+19:3/0 = 0
+20:3/0 = 0
+21:3/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+7:4/0 = 0
+8:4/0 = 0
+11:4/0 = 0
+15:4/0 = 0
+16:4/0 = 0
+17:4/0 = 0
+18:4/0 = 0
+19:4/0 = 0
+0:5/0 = 0
+11:5/0 = 0
+12:5/0 = 0
+13:5/0 = 0
+14:5/0 = 0
+0:6/0 = 0
+1:6/0 = 0
+2:6/0 = 0
+3:6/0 = 0
+4:6/0 = 0
+5:6/0 = 0
+6:6/0 = 0
+7:6/0 = 0
+8:6/0 = 0
+9:6/0 = 0
+11:6/0 = 0
+12:6/0 = 0
+13:6/0 = 0
+14:6/0 = 0
+15:6/0 = 0
+16:6/0 = 0
+17:6/0 = 0
+18:6/0 = 0
+19:6/0 = 0
+20:6/0 = 0
+0:7/0 = 0
+1:7/0 = 0
+2:7/0 = 0
+3:7/0 = 0
+4:7/0 = 0
+5:7/0 = 0
+6:7/0 = 0
+7:7/0 = 0
+8:7/0 = 0
+9:7/0 = 0
+11:7/0 = 0
+12:7/0 = 0
+13:7/0 = 0
+14:7/0 = 0
+15:7/0 = 0
+16:7/0 = 0
+17:7/0 = 0
+18:7/0 = 0
+19:7/0 = 0
+20:7/0 = 0
+0:8/0 = 0
+1:8/0 = 0
+2:8/0 = 0
+3:8/0 = 0
+4:8/0 = 0
+5:8/0 = 0
+6:8/0 = 0
+7:8/0 = 0
+8:8/0 = 0
+9:8/0 = 0
+10:8/0 = 0
+11:8/0 = 0
+12:8/0 = 0
+13:8/0 = 0
+14:8/0 = 0
+15:8/0 = 0
+16:8/0 = 0
+17:8/0 = 0
+18:8/0 = 0
+19:8/0 = 0
+20:8/0 = 0
+21:8/0 = 0
+0:9/0 = 0
+1:9/0 = 0
+2:9/0 = 0
+3:9/0 = 0
+4:9/0 = 0
+5:9/0 = 0
+6:9/0 = 0
+7:9/0 = 0
+8:9/0 = 0
+9:9/0 = 0
+10:9/0 = 0
+11:9/0 = 0
+12:9/0 = 0
+13:9/0 = 0
+14:9/0 = 0
+15:9/0 = 0
+16:9/0 = 0
+17:9/0 = 0
+18:9/0 = 0
+19:9/0 = 0
+20:9/0 = 0
+21:9/0 = 0
+4:10/0 = 0
+5:10/0 = 0
+6:10/0 = 0
+7:10/0 = 0
+8:10/0 = 0
+11:10/0 = 0
+15:10/0 = 0
+16:10/0 = 0
+17:10/0 = 0
+18:10/0 = 0
+19:10/0 = 0
+0:11/0 = 0
+11:11/0 = 0
+12:11/0 = 0
+13:11/0 = 0
+14:11/0 = 0
+0:12/0 = 0
+1:12/0 = 0
+2:12/0 = 0
+3:12/0 = 0
+4:12/0 = 0
+5:12/0 = 0
+6:12/0 = 0
+7:12/0 = 0
+8:12/0 = 0
+9:12/0 = 0
+11:12/0 = 0
+11:12/0/terrain_set = 0
+11:12/0/terrain = 0
+11:12/0/terrains_peering_bit/right_side = 0
+11:12/0/terrains_peering_bit/bottom_right_corner = 0
+11:12/0/terrains_peering_bit/bottom_side = 0
+12:12/0 = 0
+12:12/0/terrain_set = 0
+12:12/0/terrain = 0
+12:12/0/terrains_peering_bit/right_side = 0
+12:12/0/terrains_peering_bit/bottom_right_corner = 0
+12:12/0/terrains_peering_bit/bottom_side = 0
+12:12/0/terrains_peering_bit/bottom_left_corner = 0
+12:12/0/terrains_peering_bit/left_side = 0
+13:12/0 = 0
+13:12/0/terrain_set = 0
+13:12/0/terrain = 0
+13:12/0/terrains_peering_bit/bottom_side = 0
+13:12/0/terrains_peering_bit/bottom_left_corner = 0
+13:12/0/terrains_peering_bit/left_side = 0
+14:12/0 = 0
+15:12/0 = 0
+16:12/0 = 0
+17:12/0 = 0
+18:12/0 = 0
+19:12/0 = 0
+20:12/0 = 0
+0:13/0 = 0
+1:13/0 = 0
+2:13/0 = 0
+3:13/0 = 0
+4:13/0 = 0
+5:13/0 = 0
+6:13/0 = 0
+7:13/0 = 0
+8:13/0 = 0
+9:13/0 = 0
+11:13/0 = 0
+11:13/0/terrain_set = 0
+11:13/0/terrain = 0
+11:13/0/terrains_peering_bit/right_side = 0
+11:13/0/terrains_peering_bit/bottom_right_corner = 0
+11:13/0/terrains_peering_bit/bottom_side = 0
+11:13/0/terrains_peering_bit/top_side = 0
+11:13/0/terrains_peering_bit/top_right_corner = 0
+12:13/0 = 0
+12:13/0/terrain_set = 0
+12:13/0/terrain = 0
+12:13/0/terrains_peering_bit/right_side = 0
+12:13/0/terrains_peering_bit/bottom_right_corner = 0
+12:13/0/terrains_peering_bit/bottom_side = 0
+12:13/0/terrains_peering_bit/bottom_left_corner = 0
+12:13/0/terrains_peering_bit/left_side = 0
+12:13/0/terrains_peering_bit/top_left_corner = 0
+12:13/0/terrains_peering_bit/top_side = 0
+12:13/0/terrains_peering_bit/top_right_corner = 0
+13:13/0 = 0
+13:13/0/terrain_set = 0
+13:13/0/terrain = 0
+13:13/0/terrains_peering_bit/bottom_side = 0
+13:13/0/terrains_peering_bit/bottom_left_corner = 0
+13:13/0/terrains_peering_bit/left_side = 0
+13:13/0/terrains_peering_bit/top_left_corner = 0
+13:13/0/terrains_peering_bit/top_side = 0
+14:13/0 = 0
+15:13/0 = 0
+16:13/0 = 0
+17:13/0 = 0
+18:13/0 = 0
+19:13/0 = 0
+20:13/0 = 0
+0:14/0 = 0
+1:14/0 = 0
+2:14/0 = 0
+3:14/0 = 0
+4:14/0 = 0
+5:14/0 = 0
+6:14/0 = 0
+7:14/0 = 0
+8:14/0 = 0
+9:14/0 = 0
+10:14/0 = 0
+11:14/0 = 0
+11:14/0/terrain_set = 0
+11:14/0/terrain = 0
+11:14/0/terrains_peering_bit/right_side = 0
+11:14/0/terrains_peering_bit/top_side = 0
+11:14/0/terrains_peering_bit/top_right_corner = 0
+12:14/0 = 0
+12:14/0/terrain_set = 0
+12:14/0/terrain = 0
+12:14/0/terrains_peering_bit/right_side = 0
+12:14/0/terrains_peering_bit/left_side = 0
+12:14/0/terrains_peering_bit/top_left_corner = 0
+12:14/0/terrains_peering_bit/top_side = 0
+12:14/0/terrains_peering_bit/top_right_corner = 0
+13:14/0 = 0
+13:14/0/terrain_set = 0
+13:14/0/terrain = 0
+13:14/0/terrains_peering_bit/left_side = 0
+13:14/0/terrains_peering_bit/top_left_corner = 0
+13:14/0/terrains_peering_bit/top_side = 0
+14:14/0 = 0
+15:14/0 = 0
+16:14/0 = 0
+17:14/0 = 0
+18:14/0 = 0
+19:14/0 = 0
+20:14/0 = 0
+21:14/0 = 0
+0:15/0 = 0
+1:15/0 = 0
+2:15/0 = 0
+3:15/0 = 0
+4:15/0 = 0
+5:15/0 = 0
+6:15/0 = 0
+7:15/0 = 0
+8:15/0 = 0
+9:15/0 = 0
+10:15/0 = 0
+11:15/0 = 0
+12:15/0 = 0
+13:15/0 = 0
+14:15/0 = 0
+15:15/0 = 0
+16:15/0 = 0
+17:15/0 = 0
+18:15/0 = 0
+19:15/0 = 0
+20:15/0 = 0
+21:15/0 = 0
+4:16/0 = 0
+5:16/0 = 0
+6:16/0 = 0
+7:16/0 = 0
+8:16/0 = 0
+15:16/0 = 0
+16:16/0 = 0
+17:16/0 = 0
+18:16/0 = 0
+19:16/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_ix58u"]
+resource_local_to_scene = true
+tile_size = Vector2i(64, 64)
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "Background"
+terrain_set_0/terrain_0/color = Color(0, 0.402837, 0.644194, 1)
+sources/3 = SubResource("TileSetAtlasSource_ytbbu")
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ix58u"]
+texture = ExtResource("7_ytbbu")
+texture_region_size = Vector2i(64, 64)
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+0:0/0/terrains_peering_bit/right_side = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 0
+1:0/0/terrains_peering_bit/right_side = 0
+1:0/0/terrains_peering_bit/left_side = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 0
+2:0/0/terrains_peering_bit/left_side = 0
+3:0/0 = 0
+4:0/0 = 0
+5:0/0 = 0
+6:0/0 = 0
+7:0/0 = 0
+8:0/0 = 0
+9:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+7:1/0 = 0
+8:1/0 = 0
+9:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+7:2/0 = 0
+8:2/0 = 0
+9:2/0 = 0
+10:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+7:3/0 = 0
+8:3/0 = 0
+9:3/0 = 0
+10:3/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+7:4/0 = 0
+8:4/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_vjq6t"]
+tile_size = Vector2i(64, 64)
+terrain_set_0/mode = 0
+terrain_set_0/terrain_0/name = "Ground"
+terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
+sources/1 = SubResource("TileSetAtlasSource_ix58u")
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ground"]
 size = Vector2(1280, 50)
 
 [node name="AvoidTheObstacles" instance=ExtResource("1_base")]
 script = ExtResource("2_script")
+lion_scene = ExtResource("7_ix58u")
+giant_flam_scene = ExtResource("5_clq4u")
+giant_spirit_scene = ExtResource("6_ebwln")
 
 [node name="TitleLabel" parent="UI/IntroContainer/VBoxContainer" index="0"]
 text = "Avoid the Obstacles!"
@@ -104,22 +544,24 @@ offset_bottom = 720.0
 color = Color(0.0980392, 0.0980392, 0.152941, 1)
 metadata/_edit_lock_ = true
 
-[node name="Ground" type="StaticBody2D" parent="GameContainer" index="1"]
+[node name="TileMapBackground" type="TileMapLayer" parent="GameContainer" index="1"]
+tile_map_data = PackedByteArray("AAATAAoAAwANAA4AAAATAAkAAwANAA0AAAATAAgAAwANAA0AAAATAAcAAwANAA0AAAATAAYAAwANAA0AAAATAAUAAwANAA0AAAATAAQAAwANAA0AAAATAAMAAwANAA0AAAATAAIAAwANAA0AAAATAAEAAwANAA0AAAATAAAAAwANAAwAAAASAAoAAwAMAA4AAAASAAkAAwAMAA0AAAASAAgAAwAMAA0AAAASAAcAAwAMAA0AAAASAAYAAwAMAA0AAAASAAUAAwAMAA0AAAASAAQAAwAMAA0AAAASAAMAAwAMAA0AAAASAAIAAwAMAA0AAAASAAEAAwAMAA0AAAASAAAAAwAMAAwAAAARAAoAAwAMAA4AAAARAAkAAwAMAA0AAAARAAgAAwAMAA0AAAARAAcAAwAMAA0AAAARAAYAAwAMAA0AAAARAAUAAwAMAA0AAAARAAQAAwAMAA0AAAARAAMAAwAMAA0AAAARAAIAAwAMAA0AAAARAAEAAwAMAA0AAAARAAAAAwAMAAwAAAAQAAoAAwAMAA4AAAAQAAkAAwAMAA0AAAAQAAgAAwAMAA0AAAAQAAcAAwAMAA0AAAAQAAYAAwAMAA0AAAAQAAUAAwAMAA0AAAAQAAQAAwAMAA0AAAAQAAMAAwAMAA0AAAAQAAIAAwAMAA0AAAAQAAEAAwAMAA0AAAAQAAAAAwAMAAwAAAAPAAoAAwAMAA4AAAAPAAkAAwAMAA0AAAAPAAgAAwAMAA0AAAAPAAcAAwAMAA0AAAAPAAYAAwAMAA0AAAAPAAUAAwAMAA0AAAAPAAQAAwAMAA0AAAAPAAMAAwAMAA0AAAAPAAIAAwAMAA0AAAAPAAEAAwAMAA0AAAAPAAAAAwAMAAwAAAAOAAoAAwAMAA4AAAAOAAkAAwAMAA0AAAAOAAgAAwAMAA0AAAAOAAcAAwAMAA0AAAAOAAYAAwAMAA0AAAAOAAUAAwAMAA0AAAAOAAQAAwAMAA0AAAAOAAMAAwAMAA0AAAAOAAIAAwAMAA0AAAAOAAEAAwAMAA0AAAAOAAAAAwAMAAwAAAANAAoAAwAMAA4AAAANAAkAAwAMAA0AAAANAAgAAwAMAA0AAAANAAcAAwAMAA0AAAANAAYAAwAMAA0AAAANAAUAAwAMAA0AAAANAAQAAwAMAA0AAAANAAMAAwAMAA0AAAANAAIAAwAMAA0AAAANAAEAAwAMAA0AAAANAAAAAwAMAAwAAAAMAAoAAwAMAA4AAAAMAAkAAwAMAA0AAAAMAAgAAwAMAA0AAAAMAAcAAwAMAA0AAAAMAAYAAwAMAA0AAAAMAAUAAwAMAA0AAAAMAAQAAwAMAA0AAAAMAAMAAwAMAA0AAAAMAAIAAwAMAA0AAAAMAAEAAwAMAA0AAAAMAAAAAwAMAAwAAAALAAoAAwAMAA4AAAALAAkAAwAMAA0AAAALAAgAAwAMAA0AAAALAAcAAwAMAA0AAAALAAYAAwAMAA0AAAALAAUAAwAMAA0AAAALAAQAAwAMAA0AAAALAAMAAwAMAA0AAAALAAIAAwAMAA0AAAALAAEAAwAMAA0AAAALAAAAAwAMAAwAAAAKAAoAAwAMAA4AAAAKAAkAAwAMAA0AAAAKAAgAAwAMAA0AAAAKAAcAAwAMAA0AAAAKAAYAAwAMAA0AAAAKAAUAAwAMAA0AAAAKAAQAAwAMAA0AAAAKAAMAAwAMAA0AAAAKAAIAAwAMAA0AAAAKAAEAAwAMAA0AAAAKAAAAAwAMAAwAAAAJAAoAAwAMAA4AAAAJAAkAAwAMAA0AAAAJAAgAAwAMAA0AAAAJAAcAAwAMAA0AAAAJAAYAAwAMAA0AAAAJAAUAAwAMAA0AAAAJAAQAAwAMAA0AAAAJAAMAAwAMAA0AAAAJAAIAAwAMAA0AAAAJAAEAAwAMAA0AAAAJAAAAAwAMAAwAAAAIAAoAAwAMAA4AAAAIAAkAAwAMAA0AAAAIAAgAAwAMAA0AAAAIAAcAAwAMAA0AAAAIAAYAAwAMAA0AAAAIAAUAAwAMAA0AAAAIAAQAAwAMAA0AAAAIAAMAAwAMAA0AAAAIAAIAAwAMAA0AAAAIAAEAAwAMAA0AAAAIAAAAAwAMAAwAAAAHAAoAAwAMAA4AAAAHAAkAAwAMAA0AAAAHAAgAAwAMAA0AAAAHAAcAAwAMAA0AAAAHAAYAAwAMAA0AAAAHAAUAAwAMAA0AAAAHAAQAAwAMAA0AAAAHAAMAAwAMAA0AAAAHAAIAAwAMAA0AAAAHAAEAAwAMAA0AAAAHAAAAAwAMAAwAAAAGAAoAAwAMAA4AAAAGAAkAAwAMAA0AAAAGAAgAAwAMAA0AAAAGAAcAAwAMAA0AAAAGAAYAAwAMAA0AAAAGAAUAAwAMAA0AAAAGAAQAAwAMAA0AAAAGAAMAAwAMAA0AAAAGAAIAAwAMAA0AAAAGAAEAAwAMAA0AAAAGAAAAAwAMAAwAAAAFAAoAAwAMAA4AAAAFAAkAAwAMAA0AAAAFAAgAAwAMAA0AAAAFAAcAAwAMAA0AAAAFAAYAAwAMAA0AAAAFAAUAAwAMAA0AAAAFAAQAAwAMAA0AAAAFAAMAAwAMAA0AAAAFAAIAAwAMAA0AAAAFAAEAAwAMAA0AAAAFAAAAAwAMAAwAAAAEAAoAAwAMAA4AAAAEAAkAAwAMAA0AAAAEAAgAAwAMAA0AAAAEAAcAAwAMAA0AAAAEAAYAAwAMAA0AAAAEAAUAAwAMAA0AAAAEAAQAAwAMAA0AAAAEAAMAAwAMAA0AAAAEAAIAAwAMAA0AAAAEAAEAAwAMAA0AAAAEAAAAAwAMAAwAAAADAAoAAwAMAA4AAAADAAkAAwAMAA0AAAADAAgAAwAMAA0AAAADAAcAAwAMAA0AAAADAAYAAwAMAA0AAAADAAUAAwAMAA0AAAADAAQAAwAMAA0AAAADAAMAAwAMAA0AAAADAAIAAwAMAA0AAAADAAEAAwAMAA0AAAADAAAAAwAMAAwAAAACAAoAAwAMAA4AAAACAAkAAwAMAA0AAAACAAgAAwAMAA0AAAACAAcAAwAMAA0AAAACAAYAAwAMAA0AAAACAAUAAwAMAA0AAAACAAQAAwAMAA0AAAACAAMAAwAMAA0AAAACAAIAAwAMAA0AAAACAAEAAwAMAA0AAAACAAAAAwAMAAwAAAABAAoAAwAMAA4AAAABAAkAAwAMAA0AAAABAAgAAwAMAA0AAAABAAcAAwAMAA0AAAABAAYAAwAMAA0AAAABAAUAAwAMAA0AAAABAAQAAwAMAA0AAAABAAMAAwAMAA0AAAABAAIAAwAMAA0AAAABAAEAAwAMAA0AAAABAAAAAwAMAAwAAAAAAAoAAwALAA4AAAAAAAkAAwALAA0AAAAAAAgAAwALAA0AAAAAAAcAAwALAA0AAAAAAAYAAwALAA0AAAAAAAUAAwALAA0AAAAAAAQAAwALAA0AAAAAAAMAAwALAA0AAAAAAAIAAwALAA0AAAAAAAEAAwALAA0AAAAAAAAAAwALAAwAAAA=")
+tile_set = SubResource("TileSet_ix58u")
+
+[node name="Ground" type="StaticBody2D" parent="GameContainer" index="2"]
 position = Vector2(640, 650)
 collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Ground" index="0"]
+[node name="TileMapGround" type="TileMapLayer" parent="GameContainer/Ground" index="0"]
+position = Vector2(0, 18)
+tile_map_data = PackedByteArray("AAAJAAAAAQACAAAAAAAIAAAAAQABAAAAAAAHAAAAAQABAAAAAAAGAAAAAQABAAAAAAAFAAAAAQABAAAAAAAEAAAAAQABAAAAAAADAAAAAQABAAAAAAACAAAAAQABAAAAAAABAAAAAQABAAAAAAAAAAAAAQABAAAAAAD//wAAAQABAAAAAAD+/wAAAQABAAAAAAD9/wAAAQABAAAAAAD8/wAAAQABAAAAAAD7/wAAAQABAAAAAAD6/wAAAQABAAAAAAD5/wAAAQABAAAAAAD4/wAAAQABAAAAAAD3/wAAAQABAAAAAAD2/wAAAQAAAAAAAAA=")
+tile_set = SubResource("TileSet_vjq6t")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GameContainer/Ground" index="1"]
 position = Vector2(0, 43)
 shape = SubResource("RectangleShape2D_ground")
 
-[node name="ColorRect" type="ColorRect" parent="GameContainer/Ground" index="1"]
-offset_left = -640.0
-offset_top = 18.0
-offset_right = 640.0
-offset_bottom = 68.0
-color = Color(0.45098, 0.45098, 0.45098, 1)
-
-[node name="Walls" type="Node2D" parent="GameContainer" index="2"]
+[node name="Walls" type="Node2D" parent="GameContainer" index="3"]
 
 [node name="LeftWall" type="StaticBody2D" parent="GameContainer/Walls" index="0"]
 position = Vector2(10, 360)
@@ -141,10 +583,10 @@ position = Vector2(0, -5)
 rotation = 1.5708
 shape = SubResource("RectangleShape2D_ground")
 
-[node name="ObstacleSpawnTimer" type="Timer" parent="GameContainer" index="3"]
+[node name="ObstacleSpawnTimer" type="Timer" parent="GameContainer" index="4"]
 wait_time = 1.5
 
-[node name="ObstacleSpawnPositions" type="Node2D" parent="GameContainer" index="4"]
+[node name="ObstacleSpawnPositions" type="Node2D" parent="GameContainer" index="5"]
 
 [node name="SpawnPos1" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="0"]
 position = Vector2(100, -50)
@@ -164,7 +606,7 @@ position = Vector2(900, -50)
 [node name="SpawnPos6" type="Marker2D" parent="GameContainer/ObstacleSpawnPositions" index="5"]
 position = Vector2(1100, -50)
 
-[node name="PlayerSpawnPositions" type="Node2D" parent="GameContainer" index="5"]
+[node name="PlayerSpawnPositions" type="Node2D" parent="GameContainer" index="6"]
 editor_description = "Holds position markers for player starting locations"
 
 [node name="P1Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPositions" index="0"]
@@ -173,7 +615,7 @@ position = Vector2(300, 550)
 [node name="P2Spawn" type="Marker2D" parent="GameContainer/PlayerSpawnPositions" index="1"]
 position = Vector2(900, 550)
 
-[node name="Players" type="Node2D" parent="GameContainer" index="6"]
+[node name="Players" type="Node2D" parent="GameContainer" index="7"]
 
 [node name="Player1" parent="GameContainer/Players" index="0" instance=ExtResource("3_britd")]
 position = Vector2(300, 550)
@@ -182,10 +624,10 @@ collision_mask = 3
 
 [node name="Player2" parent="GameContainer/Players" index="1" instance=ExtResource("4_vfxmd")]
 
-[node name="ObstacleContainer" type="Node2D" parent="GameContainer" index="7"]
+[node name="ObstacleContainer" type="Node2D" parent="GameContainer" index="8"]
 editor_description = "Obstacles will be added as children to this node by the script"
 
-[node name="DebugInfo" type="Label" parent="GameContainer" index="8"]
+[node name="DebugInfo" type="Label" parent="GameContainer" index="9"]
 offset_left = 20.0
 offset_top = 60.0
 offset_right = 220.0
@@ -195,6 +637,15 @@ text = "Active Obstacles: 0
 Difficulty: 0%
 Spawn Rate: 0s"
 
+[node name="ObstacleBodies" type="Node2D" parent="GameContainer" index="10"]
+
+[node name="GiantFlam" parent="GameContainer/ObstacleBodies" index="0" instance=ExtResource("5_clq4u")]
+
+[node name="GiantSpirit" parent="GameContainer/ObstacleBodies" index="1" instance=ExtResource("6_ebwln")]
+
+[node name="Lion" parent="GameContainer/ObstacleBodies" index="2" instance=ExtResource("7_ix58u")]
+
 [node name="BackgroundMusic" type="AudioStreamPlayer" parent="." index="2"]
 stream = ExtResource("3_vh6eq")
 bus = &"Minigames BGM"
+parameters/looping = true

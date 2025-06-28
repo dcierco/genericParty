@@ -29,6 +29,10 @@ var difficulty_percent = 0.0 # 0-100%
 @onready var survival_bar_p1 = $UI/SurvivalContainer/Player1SurvivalVBox/SurvivalBarP1
 @onready var survival_bar_p2 = $UI/SurvivalContainer/Player2SurvivalVBox/SurvivalBarP2
 
+@export var lion_scene: PackedScene
+@export var giant_flam_scene: PackedScene
+@export var giant_spirit_scene: PackedScene
+
 # Game state
 var player_velocities = {0: Vector2.ZERO, 1: Vector2.ZERO}
 var player_survival_times = {0: 0.0, 1: 0.0}
@@ -115,6 +119,10 @@ func setup_players():
 
 func start_gameplay():
 	super.start_gameplay()
+	
+	player1.movable = true
+	player2.movable = true
+	
 	print("AvoidTheObstacles: Gameplay Started")
 	
 	# Start spawning obstacles
@@ -242,9 +250,7 @@ func _on_obstacle_spawn_timer_timeout():
 	obstacle_spawn_timer.start()
 
 func spawn_obstacle():
-	var obstacle = RigidBody2D.new()
-	obstacle.name = "Obstacle" + str(obstacle_count)
-	obstacle_count += 1
+	var obstacle: RigidBody2D
 	
 	# Decide obstacle type (0 = falling, 1 = side, 2 = sine wave)
 	var obstacle_type = 0
@@ -252,9 +258,15 @@ func spawn_obstacle():
 	
 	if random_value < 0.4:  # 40% chance for side obstacle
 		obstacle_type = 1
-
-	elif random_value < 0.5:  # 50% chance for sine wave obstacle
+		obstacle = lion_scene.instantiate()
+	elif random_value < 0.5:  # 10% chance for sine wave obstacle
 		obstacle_type = 2
+		obstacle = giant_flam_scene.instantiate()
+	else: # 50% chance for falling obstacle
+		obstacle = giant_spirit_scene.instantiate()
+	
+	obstacle.name = "Obstacle" + str(obstacle_count)
+	obstacle_count += 1
 	
 	# Setup physics
 	obstacle.gravity_scale = randf_range(1.0, 2.0) if obstacle_type == 0 else 0.0
@@ -275,48 +287,11 @@ func spawn_obstacle():
 			slope = randf_range(-0.3, 0.3)
 		obstacle.set_meta("sine_slope", slope)  # Vertical slope while moving horizontally
 	
-	# Create collision shape
-	var collision = CollisionShape2D.new()
-	var shape
-	
-	if obstacle_type == 1:  # Side obstacle - always rectangle with half player height
-		shape = RectangleShape2D.new()
-		shape.size = Vector2(randf_range(40, 80), 25)  # Half player height
-	else:
-		# Randomize shape type for other obstacles
-		if randf() > 0.5:
-			shape = RectangleShape2D.new()
-			var size = Vector2(randf_range(30, 80), randf_range(30, 80))
-			shape.size = size
-		else:
-			shape = CircleShape2D.new()
-			shape.radius = randf_range(15, 40)
-	
-	collision.shape = shape
-	obstacle.add_child(collision)
-	
-	# Create visual
-	var visual = ColorRect.new()
-	if shape is RectangleShape2D:
-		visual.size = shape.size
-		visual.position = -shape.size/2
-	else:
-		visual.size = Vector2(shape.radius * 2, shape.radius * 2)
-		visual.position = Vector2(-shape.radius, -shape.radius)
-	
-	# Color based on obstacle type
-	if obstacle_type == 0:
-		# Falling obstacles - red
-		var color_value = lerp(0.3, 0.7, difficulty_percent / 100.0)
-		visual.color = Color(color_value, 0.2, 0.2)
-	elif obstacle_type == 1:
-		# Side obstacles - blue
-		visual.color = Color(0.2, 0.2, 0.7)
-	else:
-		# Sine wave obstacles - purple
-		visual.color = Color(0.7, 0.2, 0.7)
-	
-	obstacle.add_child(visual)
+	# Random scaling for falling and sine wave obstacles
+	if obstacle_type == 0 or obstacle_type == 2:
+		var scale_size = randf_range(0.4, 0.8)
+		for child in obstacle.get_children():
+			child.scale *= scale_size
 	
 	# Set spawn position and velocity based on type
 	if obstacle_type == 0:  # Falling from top
@@ -333,21 +308,23 @@ func spawn_obstacle():
 			randf_range(-50, 50),  # Some horizontal velocity
 			randf_range(min_speed, max_speed)  # Vertical fall speed
 		)
+		
 	elif obstacle_type == 1:  # Side obstacle
 		# Spawn on left or right side
 		var from_left = randf() > 0.5
-		var y_pos = ground_node.global_position.y - 15  # Just above ground level
+		var y_pos = ground_node.global_position.y - 6  # Just above ground level
 		
 		if from_left:
 			obstacle.global_position = Vector2(-50, y_pos)
 			obstacle.linear_velocity = Vector2(randf_range(200, 300), 0)  # Move right
+			obstacle.get_child(0).flip_h = true
 		else:
 			obstacle.global_position = Vector2(1330, y_pos)
 			obstacle.linear_velocity = Vector2(randf_range(-300, -200), 0)  # Move left
 	else:  # Sine wave
 		# Spawn at same height as side obstacles
 		var from_left = randf() > 0.5
-		var y_pos = ground_node.global_position.y - 15  # Same as side obstacles
+		var y_pos = ground_node.global_position.y - 6  # Same as side obstacles
 		
 		# Store initial center position for sine wave calculations
 		obstacle.set_meta("initial_y", y_pos)
@@ -358,6 +335,8 @@ func spawn_obstacle():
 		else:
 			obstacle.global_position = Vector2(1330, y_pos)
 			obstacle.linear_velocity = Vector2(randf_range(-280, -120), 0)  # Varying horizontal speed
+	
+	obstacle.get_child(0).play("default")
 	
 	# Add auto-cleanup when obstacle exits screen
 	var visibility_notifier = VisibleOnScreenNotifier2D.new()
@@ -468,14 +447,14 @@ func update_sine_obstacles(delta):
 			# Add slope component (gradual rise/fall over time)
 			var slope_offset = slope * sine_time * 20  # Scale slope effect
 			
-
 			# Set position relative to initial center position
 			var target_y = initial_y + sine_offset + slope_offset
-			obstacle.position.y = target_y
 			
-			# Maintain horizontal velocity only
-			var current_velocity = obstacle.linear_velocity
-			obstacle.linear_velocity = Vector2(current_velocity.x, 0)
+			# Control the body using velocity
+			var required_vertical_velocity = (target_y - obstacle.position.y) / delta
+			
+			# Set the body's velocity, preserving its horizontal speed.
+			obstacle.linear_velocity = Vector2(obstacle.linear_velocity.x, required_vertical_velocity)
 
 func end_minigame():
 	if current_state == MinigameState.FINISHED or current_state == MinigameState.RESULTS:
