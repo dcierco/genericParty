@@ -2,11 +2,11 @@
 
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_7f2yl"]
 [ext_resource type="Script" uid="uid://chv02urimxmlt" path="res://scripts/minigames/race_game.gd" id="2_3w2rc"]
-[ext_resource type="Texture2D" uid="uid://dnygpdpfv7h43" path="res://sprites/players/MonkeyBoxerRed_SpriteSheet.png" id="3_m5c4s"]
-[ext_resource type="Texture2D" uid="uid://chmjcu6n3ldig" path="res://sprites/elements/FlagBlue16x16.png" id="4_7taso"]
-[ext_resource type="Texture2D" uid="uid://1tw38874xosb" path="res://sprites/players/MonkeyBoxerBlue_SpriteSheet.png" id="4_a4idd"]
-[ext_resource type="Texture2D" uid="uid://d1viomr07r6pe" path="res://sprites/elements/FlagRed16x16.png" id="4_jeo6c"]
-[ext_resource type="AudioStream" uid="uid://6mnl3iv8u4lw" path="res://sfx/17 - Fight.ogg" id="5_a4idd"]
+[ext_resource type="Texture2D" uid="uid://dnygpdpfv7h43" path="res://assets/sprites/players/MonkeyBoxerRed_SpriteSheet.png" id="3_m5c4s"]
+[ext_resource type="Texture2D" uid="uid://chmjcu6n3ldig" path="res://assets/sprites/elements/FlagBlue16x16.png" id="4_7taso"]
+[ext_resource type="Texture2D" uid="uid://1tw38874xosb" path="res://assets/sprites/players/MonkeyBoxerBlue_SpriteSheet.png" id="4_a4idd"]
+[ext_resource type="Texture2D" uid="uid://d1viomr07r6pe" path="res://assets/sprites/elements/FlagRed16x16.png" id="4_jeo6c"]
+[ext_resource type="AudioStream" uid="uid://6mnl3iv8u4lw" path="res://assets/sfx/17 - Fight.ogg" id="5_a4idd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p1fill"]
 bg_color = Color(1, 0.2, 0.2, 1)

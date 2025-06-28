@@ -3,10 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://dhf74egj0b4jv" path="res://scenes/minigames/minigame_base.tscn" id="1_base"]
 [ext_resource type="Script" uid="uid://d3m8lal6p2n1" path="res://scripts/minigames/jumping_platforms.gd" id="2_script"]
 [ext_resource type="PackedScene" uid="uid://c4kxxkpsq38jt" path="res://scenes/players/player1.tscn" id="3_7ts5n"]
-[ext_resource type="AudioStream" uid="uid://ca63miah030k5" path="res://sfx/34  - Fight.ogg" id="3_uum82"]
+[ext_resource type="AudioStream" uid="uid://ca63miah030k5" path="res://assets/sfx/34  - Fight.ogg" id="3_uum82"]
 [ext_resource type="PackedScene" uid="uid://cmy06endigfl2" path="res://scenes/players/player2.tscn" id="4_bf7lg"]
-[ext_resource type="Texture2D" uid="uid://b2s4yk4g4hcyy" path="res://sprites/tilesets/TilesetField.png" id="5_1yarn"]
-[ext_resource type="Texture2D" uid="uid://dg2x47p7u2fsl" path="res://sprites/tilesets/platform.png" id="5_bf7lg"]
+[ext_resource type="Texture2D" uid="uid://b2s4yk4g4hcyy" path="res://assets/sprites/tilesets/TilesetField.png" id="5_1yarn"]
+[ext_resource type="Texture2D" uid="uid://dg2x47p7u2fsl" path="res://assets/sprites/tilesets/platform.png" id="5_bf7lg"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_eiol1"]
 texture = ExtResource("5_1yarn")

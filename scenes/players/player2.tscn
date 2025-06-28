@@ -1,9 +1,9 @@
 [gd_scene load_steps=30 format=3 uid="uid://cmy06endigfl2"]
 
 [ext_resource type="Script" uid="uid://bugl53odlen4u" path="res://scripts/player.gd" id="1_djfu1"]
-[ext_resource type="Texture2D" uid="uid://1tw38874xosb" path="res://sprites/players/MonkeyBoxerBlue_SpriteSheet.png" id="2_qqdwt"]
-[ext_resource type="AudioStream" uid="uid://cq6l0u1k4kg33" path="res://sfx/Jump.wav" id="3_270b4"]
-[ext_resource type="AudioStream" uid="uid://dab4c8chglyc7" path="res://sfx/Sword2.wav" id="4_qqdwt"]
+[ext_resource type="Texture2D" uid="uid://1tw38874xosb" path="res://assets/sprites/players/MonkeyBoxerBlue_SpriteSheet.png" id="2_qqdwt"]
+[ext_resource type="AudioStream" uid="uid://cq6l0u1k4kg33" path="res://assets/sfx/Jump.wav" id="3_270b4"]
+[ext_resource type="AudioStream" uid="uid://dab4c8chglyc7" path="res://assets/sfx/Sword2.wav" id="4_qqdwt"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_bdxxf"]
 atlas = ExtResource("2_qqdwt")
